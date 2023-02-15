@@ -13,6 +13,11 @@ project "Sandbox"
 		"src/**.cpp"
 	}
 
+	includedirs
+	{
+		"%{wks.location}/MagmaEngine/src/"
+	}
+
 	links
 	{
 		"MagmaEngine"

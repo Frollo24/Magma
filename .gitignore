@@ -1,0 +1,15 @@
+# Build Directories
+
+/Build/Binaries
+/Build/Intermediates
+
+#Visual Studio Directories
+
+.vs
+
+#Visual Studio Files
+
+*.sln
+*.vcxproj
+*.filters
+*.user

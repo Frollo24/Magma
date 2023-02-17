@@ -15,7 +15,8 @@ project "Sandbox"
 
 	includedirs
 	{
-		"%{wks.location}/MagmaEngine/src/"
+		"%{wks.location}/MagmaEngine/src/",
+		"%{wks.location}/MagmaEngine/vendor/spdlog/include/"
 	}
 
 	links

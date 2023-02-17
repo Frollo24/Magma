@@ -1,0 +1,3 @@
+[submodule "MagmaEngine/vendor/spdlog"]
+	path = MagmaEngine/vendor/spdlog
+	url = https://github.com/gabime/spdlog

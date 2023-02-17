@@ -14,7 +14,8 @@ project "MagmaEngine"
 
 	includedirs
 	{
-		"src"
+		"src",
+		"vendor/spdlog/include/"
 	}
 
 	filter "system:windows"

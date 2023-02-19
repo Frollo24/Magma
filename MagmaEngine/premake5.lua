@@ -6,6 +6,9 @@ project "MagmaEngine"
 	targetdir ("%{wks.location}/" .. outputbindir .. "/%{prj.name}")
 	objdir ("%{wks.location}/" .. outputintdir .. "/%{prj.name}")
 
+	pchheader "mgmpch.h"
+	pchsource "src/mgmpch.cpp"
+
 	files
 	{
 		"src/**.h",

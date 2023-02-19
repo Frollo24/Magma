@@ -1,3 +1,4 @@
+#include "mgmpch.h"
 #include "Application.h"
 
 #include "Magma/Events/WindowEvent.h"

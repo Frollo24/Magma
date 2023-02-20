@@ -1,8 +1,9 @@
 #include "mgmpch.h"
 #include "Application.h"
 
-#include "Magma/Events/WindowEvent.h"
-#include "Magma/Core/Log.h"
+#include "Magma/Window/WindowSystem.h"
+
+#include <GLFW/glfw3.h> // TEMPORARY
 
 namespace Magma
 {
@@ -11,18 +12,24 @@ namespace Magma
 	Application::Application()
 	{
 		s_Instance = this;
+		WindowSystem::Init();
+		m_Window = WindowSystem::Create();
 	}
 
 	Application::~Application()
 	{
+		WindowSystem::Destroy(m_Window);
+		WindowSystem::Shutdown();
 		s_Instance = nullptr;
 	}
 
 	void Application::Run()
 	{
-		WindowResizeEvent e(1280, 720);
-		MGM_CORE_TRACE("{0}", e);
-
-		while (true);
+		while (m_Running)
+		{
+			glClearColor(1, 0, 0, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
+			m_Window->OnUpdate();
+		}
 	}
 }

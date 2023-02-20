@@ -10,6 +10,9 @@
 #include <functional>
 #include <utility>
 
+#include <typeinfo>
+#include <type_traits>
+
 #include <array>
 #include <vector>
 #include <unordered_set>

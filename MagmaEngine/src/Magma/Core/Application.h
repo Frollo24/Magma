@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Magma/Core/Base.h"
+#include "Magma/Window/Window.h"
 
 namespace Magma
 {
@@ -16,6 +17,8 @@ namespace Magma
 
 	private:
 		static Application* s_Instance;
+		bool m_Running = true;
+		Scope<Window> m_Window;
 	};
 
 	// To be defined by client

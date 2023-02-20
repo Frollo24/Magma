@@ -1,3 +1,6 @@
 [submodule "MagmaEngine/vendor/spdlog"]
 	path = MagmaEngine/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "MagmaEngine/vendor/GLFW"]
+	path = MagmaEngine/vendor/GLFW
+	url = https://github.com/Frollo24/GLFW

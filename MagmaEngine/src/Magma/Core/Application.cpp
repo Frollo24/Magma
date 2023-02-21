@@ -14,6 +14,7 @@ namespace Magma
 		s_Instance = this;
 		WindowSystem::Init();
 		m_Window = WindowSystem::Create();
+		m_Window->SetEventCallback(MGM_BIND_EVENT_FN(Application::OnEvent));
 	}
 
 	Application::~Application()
@@ -31,5 +32,17 @@ namespace Magma
 			glClear(GL_COLOR_BUFFER_BIT);
 			m_Window->OnUpdate();
 		}
+	}
+
+	void Application::OnEvent(Event& e)
+	{
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<WindowCloseEvent>(MGM_BIND_EVENT_FN(Application::OnWindowClose));
+	}
+
+	bool Application::OnWindowClose(WindowCloseEvent& e)
+	{
+		m_Running = false;
+		return false;
 	}
 }

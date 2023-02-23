@@ -1,10 +1,15 @@
 #define MAGMA_ENTRY_POINT
 #include <Magma.h>
 
+#include "SandboxLayer.h"
+
 class Sandbox : public Magma::Application
 {
 public:
-	Sandbox() = default;
+	Sandbox()
+	{
+		PushLayer(new SandboxLayer());
+	}
 	virtual ~Sandbox() = default;
 };
 

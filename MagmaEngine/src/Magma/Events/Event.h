@@ -32,7 +32,7 @@ namespace Magma
 #define EVENT_CLASS_CATEGORY(category) virtual EventCategory GetCategoryFlags() const override { return (EventCategory)(category); }\
                                        virtual int GetCategoryFlagsAsInt() const override { return (int)(category); }
 
-	class Event
+	class MAGMA_API Event
 	{
 	public:
 		virtual ~Event() = default;
@@ -51,7 +51,7 @@ namespace Magma
 		}
 
 	private:
-		bool m_Handled;
+		bool m_Handled = false;
 	};
 
 	class EventDispatcher

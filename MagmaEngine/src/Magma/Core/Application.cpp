@@ -30,6 +30,10 @@ namespace Magma
 		{
 			glClearColor(1, 0, 0, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
+
+			for (Layer* layer : m_LayerStack)
+				layer->OnUpdate();
+
 			m_Window->OnUpdate();
 		}
 	}
@@ -38,11 +42,28 @@ namespace Magma
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(MGM_BIND_EVENT_FN(Application::OnWindowClose));
+
+		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		{
+			if (e.Handled()) break;
+			(*it)->OnEvent(e);
+		}
+	}
+
+	void Application::PushLayer(Layer* layer)
+	{
+		if (layer) m_LayerStack.PushLayer(layer);
+	}
+
+	void Application::PushOverlay(Layer* overlay)
+	{
+		if (overlay) m_LayerStack.PushOverlay(overlay);
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
+		MGM_CORE_WARN("{0}", e);
 		m_Running = false;
-		return false;
+		return true;
 	}
 }

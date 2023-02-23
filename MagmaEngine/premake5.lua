@@ -2,6 +2,7 @@ project "MagmaEngine"
 	kind "SharedLib"
 	language "C++"
 	cppdialect "C++17"
+	staticruntime "Off"
 
 	targetdir ("%{wks.location}/" .. outputbindir .. "/%{prj.name}")
 	objdir ("%{wks.location}/" .. outputintdir .. "/%{prj.name}")
@@ -29,7 +30,6 @@ project "MagmaEngine"
 	}
 
 	filter "system:windows"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines

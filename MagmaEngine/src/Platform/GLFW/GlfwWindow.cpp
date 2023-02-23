@@ -79,24 +79,28 @@ namespace Magma
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
+			static int repeatCount = 1;
 			switch (action)
 			{
 				case GLFW_PRESS:
 				{
 					KeyPressedEvent event((KeyCode)key, 0);
 					data.EventCallback(event);
+					repeatCount = 1;
 					break;
 				}
 				case GLFW_RELEASE:
 				{
 					KeyReleasedEvent event((KeyCode)key);
 					data.EventCallback(event);
+					repeatCount = 1;
 					break;
 				}
 				case GLFW_REPEAT:
 				{
-					KeyPressedEvent event((KeyCode)key, 1);
+					KeyPressedEvent event((KeyCode)key, repeatCount);
 					data.EventCallback(event);
+					repeatCount++;
 					break;
 				}
 			}

@@ -3,6 +3,7 @@
 #include "Magma/Core/Base.h"
 #include "Magma/Core/LayerStack.h"
 #include "Magma/Core/Time.h"
+#include "Magma/Core/Input.h"
 #include "Magma/Events/Event.h"
 #include "Magma/Events/WindowEvent.h"
 #include "Magma/Window/Window.h"
@@ -22,6 +23,8 @@ namespace Magma
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
+
+		Window& GetWindow() { return *m_Window; }
 
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);

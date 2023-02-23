@@ -7,3 +7,4 @@
 #include "Magma/Core/Log.h"
 #include "Magma/Core/Assert.h"
 #include "Magma/Core/Memory.h"
+#include "Magma/Core/Time.h"

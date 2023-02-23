@@ -28,6 +28,15 @@ namespace Magma
 	{
 		while (m_Running)
 		{
+			float time = m_Window->GetTime();
+			Timestep timestep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+
+			Time::SetTotalTime(time);
+			Time::SetDeltaTime(timestep);
+
+			MGM_CORE_TRACE("Delta Time: {0} seconds", Time::DeltaTime);
+
 			glClearColor(1, 0, 0, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 

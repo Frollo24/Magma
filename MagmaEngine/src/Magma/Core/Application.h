@@ -2,9 +2,10 @@
 
 #include "Magma/Core/Base.h"
 #include "Magma/Core/LayerStack.h"
-#include "Magma/Window/Window.h"
+#include "Magma/Core/Time.h"
 #include "Magma/Events/Event.h"
 #include "Magma/Events/WindowEvent.h"
+#include "Magma/Window/Window.h"
 
 namespace Magma
 {
@@ -27,6 +28,8 @@ namespace Magma
 
 		static Application* s_Instance;
 		bool m_Running = true;
+		float m_LastFrameTime = 0.0f;
+
 		Scope<Window> m_Window;
 		LayerStack m_LayerStack;
 	};

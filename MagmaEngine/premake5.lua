@@ -13,14 +13,17 @@ project "MagmaEngine"
 	files
 	{
 		"src/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+		"vendor/glm/glm/**.hpp",
+		"vendor/glm/glm/**.inl"
 	}
 
 	includedirs
 	{
 		"src",
 		"vendor/spdlog/include/",
-		"%{IncludeDir.GLFW}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.glm}"
 	}
 
 	links

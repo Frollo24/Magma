@@ -17,7 +17,8 @@ project "Sandbox"
 	{
 		"src/",
 		"%{wks.location}/MagmaEngine/src/",
-		"%{wks.location}/MagmaEngine/vendor/spdlog/include/"
+		"%{wks.location}/MagmaEngine/vendor/spdlog/include/",
+		"%{wks.location}/MagmaEngine/vendor/glm/"
 	}
 
 	links

@@ -23,13 +23,19 @@ project "MagmaEngine"
 		"src",
 		"vendor/spdlog/include/",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.Vulkan}"
+	}
+
+	libdirs
+	{
+		"%{LibraryDirs.Vulkan}"
 	}
 
 	links
 	{
 		"GLFW",
-		"opengl32.lib"
+		"%{Libraries.Vulkan}"
 	}
 
 	filter "system:windows"

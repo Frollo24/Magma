@@ -3,8 +3,6 @@
 
 #include "Magma/Window/WindowSystem.h"
 
-#include <GLFW/glfw3.h> // TEMPORARY
-
 namespace Magma
 {
 	Application* Application::s_Instance = nullptr;
@@ -35,27 +33,8 @@ namespace Magma
 			Time::SetTotalTime(time);
 			Time::SetDeltaTime(timestep);
 
-			glClearColor(1, 0, 0, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
-
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
-
-			auto mousePos = Input::GetMousePosition();
-			//MGM_CORE_TRACE("{0}, {1}", mousePos.x, mousePos.y);
-
-			//if (Input::IsKeyUp(KeyCode::W)) {
-			//	MGM_CORE_INFO("W key is moved up");
-			//}
-			//if (Input::IsKeyDown(KeyCode::W)) {
-			//	MGM_CORE_INFO("W key is moved down");
-			//}
-			//if (Input::IsKeyPressed(KeyCode::W)) {
-			//	MGM_CORE_WARN("W key is pressed");
-			//}
-			//if (Input::IsKeyReleased(KeyCode::W)) {
-			//	MGM_CORE_TRACE("W key is released");
-			//}
 
 			Input::OnUpdate();
 			m_Window->OnUpdate();

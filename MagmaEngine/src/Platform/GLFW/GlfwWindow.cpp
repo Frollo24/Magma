@@ -38,13 +38,13 @@ namespace Magma
 	void GlfwWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window); // TEMPORARY
+		m_Instance->PresentFrame();
 	}
 
 	void GlfwWindow::SetVSync(bool enabled)
 	{
-		glfwSwapInterval(enabled); // TEMPORARY
 		m_Data.VSync = enabled;
+		m_Instance->SetVSync(enabled);
 	}
 
 	void GlfwWindow::Init(const WindowProps& props)
@@ -55,8 +55,10 @@ namespace Magma
 
 		MGM_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 		m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window); // TEMPORARY
 		glfwSetWindowUserPointer(m_Window, &m_Data);
+
+		m_Instance = GraphicsInstance::Create(m_Window);
+		m_Instance->Init();
 		SetVSync(true);
 
 		//Set GLFW callbacks

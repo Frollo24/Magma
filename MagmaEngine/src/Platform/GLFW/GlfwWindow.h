@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Magma/Window/Window.h"
+#include "Magma/Renderer/GraphicsInstance.h"
 
 #include <GLFW/glfw3.h>
 
@@ -28,7 +29,8 @@ namespace Magma
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 	private:
-		GLFWwindow* m_Window;
+		GLFWwindow* m_Window = nullptr;
+		Scope<GraphicsInstance> m_Instance = nullptr;
 
 		struct WindowData
 		{

@@ -1,5 +1,6 @@
 #include "mgmpch.h"
 #include "VulkanInstance.h"
+#include "ValidationLayers.h"
 
 #include <GLFW/glfw3.h>
 
@@ -8,10 +9,15 @@ namespace Magma
 	VulkanInstance::VulkanInstance(void* window)
 		: m_WindowHandle(window)
 	{
+		MGM_CORE_ASSERT(window, "Window handle is null!");
+		MGM_CORE_VERIFY(ValidationLayers::CheckValidationLayerSupport());
 	}
 
 	VulkanInstance::~VulkanInstance()
 	{
+		if (ValidationLayers::Enabled())
+			ValidationLayers::DestroyDebugMessenger(m_Instance);
+
 		vkDestroyInstance(m_Instance, nullptr);
 	}
 
@@ -29,11 +35,23 @@ namespace Magma
 		auto extensions = GetRequiredExtensions();
 		createInfo.enabledExtensionCount = static_cast<u32>(extensions.size());
 		createInfo.ppEnabledExtensionNames = extensions.data();
-		createInfo.enabledLayerCount = 0;
+		if (ValidationLayers::Enabled())
+		{
+			auto& layers = ValidationLayers::GetLayers();
+			createInfo.enabledLayerCount = static_cast<u32>(layers.size());
+			createInfo.ppEnabledLayerNames = layers.data();
+
+			VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+			ValidationLayers::PopulateDebugMessengerCreateInfo(debugCreateInfo);
+			createInfo.pNext = &debugCreateInfo;
+		}
 
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance);
 		MGM_CORE_VERIFY(result == VK_SUCCESS);
 		CheckAvailableExtensions();
+
+		if (ValidationLayers::Enabled())
+			ValidationLayers::SetupDebugMessenger(m_Instance);
 	}
 
 	void VulkanInstance::SetVSync(bool enabled)

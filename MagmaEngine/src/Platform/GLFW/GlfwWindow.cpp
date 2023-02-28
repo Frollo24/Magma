@@ -53,12 +53,14 @@ namespace Magma
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
 
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		MGM_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 		m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 
 		m_Instance = GraphicsInstance::Create(m_Window);
-		m_Instance->Init();
+		m_Surface = RenderSurface::Create(m_Instance);
+		m_Instance->Init(m_Surface);
 		SetVSync(true);
 
 		//Set GLFW callbacks

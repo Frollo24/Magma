@@ -12,9 +12,12 @@ namespace Magma
 		VulkanInstance(void* window);
 		virtual ~VulkanInstance();
 
-		virtual void Init() override;
+		virtual void Init(const Scope<RenderSurface>& surface) override;
 		virtual void SetVSync(bool enabled) override;
 		virtual void PresentFrame() override;
+
+		inline void* GetWindowHandle() const { return m_WindowHandle; }
+		inline VkInstance GetInstanceHandle() const { return m_Instance; }
 
 	private:
 		static std::vector<const char*> GetRequiredExtensions();

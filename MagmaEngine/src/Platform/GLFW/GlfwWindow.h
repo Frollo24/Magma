@@ -2,6 +2,7 @@
 
 #include "Magma/Window/Window.h"
 #include "Magma/Renderer/GraphicsInstance.h"
+#include "Magma/Renderer/RenderSurface.h"
 
 #include <GLFW/glfw3.h>
 
@@ -31,6 +32,7 @@ namespace Magma
 	private:
 		GLFWwindow* m_Window = nullptr;
 		Scope<GraphicsInstance> m_Instance = nullptr;
+		Scope<RenderSurface> m_Surface = nullptr;
 
 		struct WindowData
 		{

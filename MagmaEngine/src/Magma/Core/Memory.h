@@ -22,4 +22,9 @@ namespace Magma
 
 	template<typename T>
 	using WeafRef = std::weak_ptr<T>;
+
+	template<class T, class U>
+	constexpr Ref<T> StaticCast(Ref<U> ref) { return std::static_pointer_cast<T>(ref); }
+	template<class T, class U>
+	constexpr Ref<T> DynamicCast(Ref<U> ref) { return std::dynamic_pointer_cast<T>(ref); }
 }

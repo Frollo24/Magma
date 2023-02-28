@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Magma/Core/Base.h"
+#include "Magma/Core/Build.h"
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 

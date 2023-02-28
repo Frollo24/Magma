@@ -1,17 +1,17 @@
 #include "mgmpch.h"
-#include "GraphicsInstance.h"
+#include "RenderSurface.h"
 #include "RenderContext.h"
 
-#include "RenderingAPI/Vulkan/VulkanInstance.h"
+#include "RenderingAPI/Vulkan/VulkanSurface.h"
 
 namespace Magma
 {
-	Scope<GraphicsInstance> GraphicsInstance::Create(void* windowHandle)
+	Scope<RenderSurface> RenderSurface::Create(const Scope<GraphicsInstance>& instance)
 	{
 		switch (RenderContext::GetAPI())
 		{
 			case RenderAPI::None:      MGM_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RenderAPI::Vulkan:	   return CreateScope<VulkanInstance>(windowHandle);
+			case RenderAPI::Vulkan:	   return CreateScope<VulkanSurface>(instance);
 		}
 
 		MGM_CORE_ASSERT(false, "Unknown render API!"); return nullptr;

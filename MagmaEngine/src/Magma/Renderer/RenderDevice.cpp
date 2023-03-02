@@ -7,7 +7,7 @@
 
 namespace Magma
 {
-	Ref<RenderDevice> RenderDevice::Create(GraphicsInstance& instance, const Scope<RenderSurface>& surface, const PhysicalDeviceRequirements& requirements)
+	Ref<RenderDevice> RenderDevice::Create(GraphicsInstance& instance, RenderSurface& surface, const PhysicalDeviceRequirements& requirements)
 	{
 		switch (RenderContext::GetAPI())
 		{

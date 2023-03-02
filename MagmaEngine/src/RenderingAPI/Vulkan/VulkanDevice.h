@@ -16,10 +16,16 @@ namespace Magma
 		}
 	};
 
+	struct VulkanDeviceQueueHandles
+	{
+		VkQueue GraphicsQueue = VK_NULL_HANDLE;
+		VkQueue PresentQueue = VK_NULL_HANDLE;
+	};
+
 	class VulkanDevice : public RenderDevice
 	{
 	public:
-		VulkanDevice(GraphicsInstance& instance, const Scope<RenderSurface>& surface, const PhysicalDeviceRequirements& requirements);
+		VulkanDevice(GraphicsInstance& instance, RenderSurface& surface, const PhysicalDeviceRequirements& requirements);
 		VulkanDevice(const Scope<GraphicsInstance>& instance, const Scope<RenderSurface>& surface, const PhysicalDeviceRequirements& requirements);
 		virtual ~VulkanDevice();
 
@@ -30,12 +36,14 @@ namespace Magma
 
 	private:
 		void PickPhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface, const PhysicalDeviceRequirements& requirements);
+		void CreateLogicalDevice();
 
 	private:
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 		VkDevice m_LogicalDevice = VK_NULL_HANDLE;
 
 		VulkanDeviceQueueIndices m_QueueIndices;
+		VulkanDeviceQueueHandles m_QueueHandles;
 	};
 }
 

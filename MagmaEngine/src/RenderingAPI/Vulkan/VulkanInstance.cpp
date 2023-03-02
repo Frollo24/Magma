@@ -47,6 +47,8 @@ namespace Magma
 
 	VulkanInstance::~VulkanInstance()
 	{
+		m_Device = nullptr;
+
 		if (ValidationLayers::Enabled())
 			ValidationLayers::DestroyDebugMessenger(m_Instance);
 
@@ -57,7 +59,7 @@ namespace Magma
 	{
 		PhysicalDeviceRequirements requirements{};
 		requirements.DeviceType = PhysicalDeviceType::DedicatedGPU;
-		m_Device = RenderDevice::Create(*this, surface, requirements);
+		m_Device = RenderDevice::Create(*this, *surface.get(), requirements);
 	}
 
 	void VulkanInstance::SetVSync(bool enabled)

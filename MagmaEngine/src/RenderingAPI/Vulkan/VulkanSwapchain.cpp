@@ -99,10 +99,49 @@ namespace Magma
 		VkResult result = vkCreateSwapchainKHR(m_Device, &createInfo, nullptr, &m_Swapchain);
 		MGM_CORE_VERIFY(result == VK_SUCCESS);
 		MGM_CORE_INFO("Successfully created Render Swapchain!");
+
+		RetrieveSwapchainImages();
+	}
+
+	void VulkanSwapchain::RetrieveSwapchainImages()
+	{
+		using namespace std::string_literals;
+
+		u32 imageCount = 0;
+		vkGetSwapchainImagesKHR(m_Device, m_Swapchain, &imageCount, nullptr);
+		m_Images.resize(imageCount);
+		m_ImageViews.resize(imageCount);
+		vkGetSwapchainImagesKHR(m_Device, m_Swapchain, &imageCount, m_Images.data());
+
+		for (size_t i = 0; i < imageCount; i++)
+		{
+			VkImageViewCreateInfo createInfo = {};
+			createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			createInfo.image = m_Images[i];
+			createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			createInfo.format = m_SurfaceFormat.format;
+
+			createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+			createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			createInfo.subresourceRange.baseMipLevel = 0;
+			createInfo.subresourceRange.levelCount = 1;
+			createInfo.subresourceRange.baseArrayLayer = 0;
+			createInfo.subresourceRange.layerCount = 1;
+
+			VkResult result = vkCreateImageView(m_Device, &createInfo, nullptr, &m_ImageViews[i]);
+			MGM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create imageview "s + std::to_string(i + 1) + " of " + std::to_string(m_ImageViews.size()) + "!");
+		}
 	}
 
 	void VulkanSwapchain::Destroy()
 	{
+		for (const auto& imageView : m_ImageViews)
+			vkDestroyImageView(m_Device, imageView, nullptr);
+
 		vkDestroySwapchainKHR(m_Device, m_Swapchain, nullptr);
 	}
 

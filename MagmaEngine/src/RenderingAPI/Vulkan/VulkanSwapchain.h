@@ -25,6 +25,7 @@ namespace Magma
 
 	private:
 		void Create(const Ref<VulkanDevice>& device, RenderSurface& surface, void* window);
+		void RetrieveSwapchainImages();
 		void Destroy();
 
 		VkSurfaceFormatKHR ChooseSwapchainFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const;
@@ -38,6 +39,9 @@ namespace Magma
 
 		VkSurfaceFormatKHR m_SurfaceFormat{};
 		VkExtent2D m_Extent{};
+
+		std::vector<VkImage> m_Images{};
+		std::vector<VkImageView> m_ImageViews{};
 	};
 }
 

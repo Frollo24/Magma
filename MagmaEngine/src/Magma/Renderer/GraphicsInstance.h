@@ -6,6 +6,7 @@ namespace Magma
 {
 	class RenderSurface;
 	class RenderDevice;
+	class RenderSwapchain;
 
 	class MAGMA_API GraphicsInstance
 	{
@@ -13,6 +14,7 @@ namespace Magma
 		virtual ~GraphicsInstance() = default;
 
 		virtual void Init(const Scope<RenderSurface>& surface) = 0;
+		virtual void Shutdown() = 0;
 		virtual void SetVSync(bool enabled) = 0;
 		virtual void PresentFrame() = 0;
 
@@ -20,6 +22,7 @@ namespace Magma
 
 	protected:
 		Ref<RenderDevice> m_Device;
+		Ref<RenderSwapchain> m_Swapchain;
 	};
 }
 

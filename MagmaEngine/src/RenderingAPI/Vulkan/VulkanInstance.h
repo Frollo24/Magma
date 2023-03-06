@@ -13,6 +13,7 @@ namespace Magma
 		virtual ~VulkanInstance();
 
 		virtual void Init(const Scope<RenderSurface>& surface) override;
+		virtual void Shutdown() override;
 		virtual void SetVSync(bool enabled) override;
 		virtual void PresentFrame() override;
 

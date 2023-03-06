@@ -3,6 +3,7 @@
 #include "ValidationLayers.h"
 
 #include "VulkanDevice.h"
+#include "VulkanSwapchain.h"
 #include "VulkanSurface.h"
 #include <GLFW/glfw3.h>
 
@@ -47,8 +48,6 @@ namespace Magma
 
 	VulkanInstance::~VulkanInstance()
 	{
-		m_Device = nullptr;
-
 		if (ValidationLayers::Enabled())
 			ValidationLayers::DestroyDebugMessenger(m_Instance);
 
@@ -60,6 +59,13 @@ namespace Magma
 		PhysicalDeviceRequirements requirements{};
 		requirements.DeviceType = PhysicalDeviceType::DedicatedGPU;
 		m_Device = RenderDevice::Create(*this, *surface.get(), requirements);
+		m_Swapchain = RenderSwapchain::Create(m_Device, *surface.get(), m_WindowHandle);
+	}
+
+	void VulkanInstance::Shutdown()
+	{
+		m_Swapchain = nullptr;
+		m_Device = nullptr;
 	}
 
 	void VulkanInstance::SetVSync(bool enabled)

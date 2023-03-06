@@ -147,6 +147,9 @@ namespace Magma
 
 	void GlfwWindow::Shutdown()
 	{
+		m_Instance->Shutdown();
+		m_Surface = nullptr;
+		m_Instance = nullptr;
 		glfwDestroyWindow(m_Window);
 	}
 }

@@ -3,10 +3,16 @@
 
 #include "VulkanInstance.h"
 #include "VulkanSurface.h"
+#include "VulkanSwapchain.h"
 #include "ValidationLayers.h"
 
 namespace Magma
 {
+	static const std::vector<const char*> c_DeviceExtensions =
+	{
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	};
+
 	static VulkanDeviceQueueIndices FindQueueIndices(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface)
 	{
 		VulkanDeviceQueueIndices indices;
@@ -50,6 +56,23 @@ namespace Magma
 		}
 	}
 
+	static bool CheckDeviceExtensionSupport(VkPhysicalDevice device)
+	{
+		u32 extensionCount;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+		std::unordered_set<std::string> requiredExtensions(c_DeviceExtensions.begin(), c_DeviceExtensions.end());
+
+		for (const auto& extension : availableExtensions) {
+			requiredExtensions.erase(extension.extensionName);
+		}
+
+		return requiredExtensions.empty();
+	}
+
 	static bool IsDeviceSuitable(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface,
 		const PhysicalDeviceRequirements& requirements, VulkanDeviceQueueIndices& outQueueIndices)
 	{
@@ -64,6 +87,13 @@ namespace Magma
 
 		VulkanDeviceQueueIndices queueIndices = FindQueueIndices(physicalDevice, surface);
 		if (!queueIndices.IsValid())
+			return false;
+
+		if (!CheckDeviceExtensionSupport(physicalDevice))
+			return false;
+
+		if (const auto& swapchainSupport = VulkanSwapchain::QuerySwapchainSupportDetails(physicalDevice, surface);
+			swapchainSupport.Formats.empty() || swapchainSupport.PresentModes.empty())
 			return false;
 
 		outQueueIndices = queueIndices;
@@ -158,6 +188,9 @@ namespace Magma
 			deviceCreateInfo.enabledLayerCount = 0;
 			deviceCreateInfo.ppEnabledLayerNames = nullptr;
 		}
+
+		deviceCreateInfo.enabledExtensionCount = static_cast<u32>(c_DeviceExtensions.size());
+		deviceCreateInfo.ppEnabledExtensionNames = c_DeviceExtensions.data();
 
 		VkResult result = vkCreateDevice(m_PhysicalDevice, &deviceCreateInfo, nullptr, &m_LogicalDevice);
 		MGM_CORE_VERIFY(result == VK_SUCCESS);

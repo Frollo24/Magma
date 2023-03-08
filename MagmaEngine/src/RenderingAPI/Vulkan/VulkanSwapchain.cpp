@@ -109,6 +109,7 @@ namespace Magma
 
 		u32 imageCount = 0;
 		vkGetSwapchainImagesKHR(m_Device, m_Swapchain, &imageCount, nullptr);
+		m_ImageCount = imageCount;
 		m_Images.resize(imageCount);
 		m_ImageViews.resize(imageCount);
 		vkGetSwapchainImagesKHR(m_Device, m_Swapchain, &imageCount, m_Images.data());

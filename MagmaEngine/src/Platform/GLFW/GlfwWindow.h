@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Magma/Window/Window.h"
-#include "Magma/Renderer/GraphicsInstance.h"
-#include "Magma/Renderer/RenderSurface.h"
 
 #include <GLFW/glfw3.h>
 
@@ -25,6 +23,8 @@ namespace Magma
 		inline bool IsVSync() const override { return m_Data.VSync; };
 
 		inline virtual void* GetNativeWindow() const override { return m_Window; }
+		inline virtual const Scope<GraphicsInstance>& GetGraphicsInstance() const override { return m_Instance; }
+		inline virtual const Scope<RenderSurface>& GetRenderSurface() const override { return m_Surface; }
 		inline virtual float GetTime() const override { return (float)glfwGetTime(); }
 	private:
 		virtual void Init(const WindowProps& props);

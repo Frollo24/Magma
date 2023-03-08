@@ -18,6 +18,9 @@ namespace Magma
 		virtual void SetVSync(bool enabled) = 0;
 		virtual void PresentFrame() = 0;
 
+		inline const Ref<RenderDevice>& GetDevice() const { return m_Device; }
+		inline const Ref<RenderSwapchain>& GetSwapchain() const { return m_Swapchain; }
+
 		static Scope<GraphicsInstance> Create(void* windowHandle);
 
 	protected:

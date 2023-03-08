@@ -21,6 +21,7 @@ namespace Magma
 
 		virtual ~VulkanSwapchain();
 
+		inline virtual u32 GetImageCount() const override { return m_ImageCount; }
 		static SwapchainSupportDetails QuerySwapchainSupportDetails(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);
 
 	private:
@@ -40,6 +41,7 @@ namespace Magma
 		VkSurfaceFormatKHR m_SurfaceFormat{};
 		VkExtent2D m_Extent{};
 
+		u32 m_ImageCount = 0;
 		std::vector<VkImage> m_Images{};
 		std::vector<VkImageView> m_ImageViews{};
 	};

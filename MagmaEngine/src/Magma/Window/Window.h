@@ -2,6 +2,8 @@
 
 #include "Magma/Core/Base.h"
 #include "Magma/Events/Event.h"
+#include "Magma/Renderer/GraphicsInstance.h"
+#include "Magma/Renderer/RenderSurface.h"
 
 namespace Magma
 {
@@ -32,6 +34,8 @@ namespace Magma
 		virtual bool IsVSync() const = 0;
 
 		inline virtual void* GetNativeWindow() const = 0;
+		inline virtual const Scope<GraphicsInstance>& GetGraphicsInstance() const = 0;
+		inline virtual const Scope<RenderSurface>& GetRenderSurface() const = 0;
 		inline virtual float GetTime() const = 0;
 
 		static Scope<Window> Create(const WindowProps& props = WindowProps());

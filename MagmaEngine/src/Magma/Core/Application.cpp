@@ -2,6 +2,7 @@
 #include "Application.h"
 
 #include "Magma/Window/WindowSystem.h"
+#include "Magma/Renderer/Renderer.h"
 
 namespace Magma
 {
@@ -13,10 +14,14 @@ namespace Magma
 		WindowSystem::Init();
 		m_Window = WindowSystem::Create();
 		m_Window->SetEventCallback(MGM_BIND_EVENT_FN(Application::OnEvent));
+
+		Renderer::Init();
 	}
 
 	Application::~Application()
 	{
+		Renderer::Shutdown();
+
 		WindowSystem::Destroy(m_Window);
 		WindowSystem::Shutdown();
 		s_Instance = nullptr;

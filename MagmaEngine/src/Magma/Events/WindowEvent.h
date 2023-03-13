@@ -38,6 +38,13 @@ namespace Magma
 
 		EVENT_CLASS_TYPE(WindowClose)
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_WINDOW)
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "WindowCloseEvent: " << m_Title;
+			return ss.str();
+		}
 	
 	private:
 		std::string m_Title;

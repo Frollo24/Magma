@@ -50,6 +50,16 @@ namespace Magma
 		vkDestroyCommandPool(device, m_CommandPool, nullptr);
 	}
 
+	void VulkanContext::BeginFrame()
+	{
+
+	}
+
+	void VulkanContext::EndFrame()
+	{
+
+	}
+
 	void VulkanContext::SetViewport(u32 x, u32 y, u32 width, u32 height)
 	{
 		VkViewport viewport{};
@@ -70,13 +80,16 @@ namespace Magma
 		vkCmdSetScissor(m_ActiveCommandBuffer, 0, 1, &scissor);
 	}
 
-	void VulkanContext::BeginRenderPass()
+	void VulkanContext::BeginRenderPass(const Ref<RenderPass>& renderPass)
 	{
 		// Begins a render pass
+		m_ActiveRenderPass = renderPass;
 	}
 
-	void VulkanContext::EndRenderPass()
+	void VulkanContext::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{
 		// Ends a render pass
+		MGM_CORE_ASSERT(m_ActiveRenderPass == renderPass,
+			"Cannot end this render pass while other render pass is active!");
 	}
 }

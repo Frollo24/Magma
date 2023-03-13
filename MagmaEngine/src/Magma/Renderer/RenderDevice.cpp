@@ -4,7 +4,6 @@
 
 #include "RenderingAPI/Vulkan/VulkanDevice.h"
 
-
 namespace Magma
 {
 	Ref<RenderDevice> RenderDevice::Create(GraphicsInstance& instance, RenderSurface& surface, const PhysicalDeviceRequirements& requirements)

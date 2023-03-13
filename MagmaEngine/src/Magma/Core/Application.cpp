@@ -38,8 +38,10 @@ namespace Magma
 			Time::SetTotalTime(time);
 			Time::SetDeltaTime(timestep);
 
+			Renderer::BeginFrame();
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
+			Renderer::EndFrame();
 
 			Input::OnUpdate();
 			m_Window->OnUpdate();

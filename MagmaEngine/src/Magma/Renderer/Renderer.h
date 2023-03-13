@@ -8,7 +8,12 @@ namespace Magma
 	{
 	public:
 		static void Init();
+		static void BeginFrame();
+		static void EndFrame();
 		static void Shutdown();
+
+	private:
+		static bool s_BegunFrame;
 	};
 }
 

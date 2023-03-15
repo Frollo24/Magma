@@ -26,6 +26,21 @@ namespace Magma
 		Destroy();
 	}
 
+	void VulkanSwapchain::CreateFramebuffers(const Ref<RenderDevice>& device, const Ref<RenderPass>& renderPass)
+	{
+		m_RenderPass = DynamicCast<VulkanRenderPass>(renderPass);
+		m_Framebuffers.resize(m_ImageCount);
+
+		for (size_t i = 0; i < m_ImageCount; i++) {
+			FramebufferSpecification spec;
+			spec.ImageViews.push_back(m_ImageViews[i]);
+			spec.TextureSpecs = {{ FramebufferTextureFormat::RGBA8 }};
+			spec.Width = m_Extent.width;
+			spec.Height = m_Extent.height;
+			m_Framebuffers[i] = CreateRef<VulkanFramebuffer>(spec, device, renderPass);
+		}
+	}
+
 	SwapchainSupportDetails VulkanSwapchain::QuerySwapchainSupportDetails(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
 	{
 		SwapchainSupportDetails details;
@@ -140,6 +155,10 @@ namespace Magma
 
 	void VulkanSwapchain::Destroy()
 	{
+		for (auto& framebuffer : m_Framebuffers)
+			framebuffer = nullptr;
+		m_RenderPass = nullptr;
+
 		for (const auto& imageView : m_ImageViews)
 			vkDestroyImageView(m_Device, imageView, nullptr);
 

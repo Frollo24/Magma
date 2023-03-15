@@ -3,6 +3,7 @@
 #include "RenderCommand.h"
 
 #include "Magma/Core/Application.h"
+#include "Magma/Renderer/RenderSwapchain.h"
 
 namespace Magma
 {
@@ -11,6 +12,7 @@ namespace Magma
 	struct RendererData
 	{
 		Ref<RenderDevice> RenderDevice = nullptr;
+		Ref<RenderSwapchain> RenderSwapchain = nullptr;
 	};
 
 	static RendererData* s_RendererData = nullptr;
@@ -19,6 +21,7 @@ namespace Magma
 	{
 		s_RendererData = new RendererData();
 		s_RendererData->RenderDevice = Application::Instance().GetWindow().GetGraphicsInstance()->GetDevice();
+		s_RendererData->RenderSwapchain = Application::Instance().GetWindow().GetGraphicsInstance()->GetSwapchain();
 		RenderCommand::Init();
 
 		// TEMPORARY
@@ -27,6 +30,7 @@ namespace Magma
 		swapchainSpec.IsSwapchainTarget = true;
 
 		auto renderPass = RenderPass::Create(swapchainSpec, s_RendererData->RenderDevice);
+		s_RendererData->RenderSwapchain->CreateFramebuffers(s_RendererData->RenderDevice, renderPass);
 	}
 
 	void Renderer::BeginFrame()

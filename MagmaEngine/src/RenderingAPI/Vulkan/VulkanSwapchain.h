@@ -2,6 +2,8 @@
 #include "Magma/Renderer/RenderSwapchain.h"
 
 #include "VulkanDevice.h"
+#include "VulkanRenderPass.h"
+#include "VulkanFramebuffer.h"
 #include <vulkan/vulkan.h>
 
 namespace Magma
@@ -20,6 +22,8 @@ namespace Magma
 		VulkanSwapchain(const Ref<RenderDevice>& device, const Scope<RenderSurface>& surface, void* window);
 
 		virtual ~VulkanSwapchain();
+
+		virtual void CreateFramebuffers(const Ref<RenderDevice>& device, const Ref<RenderPass>& renderPass) override;
 
 		inline virtual u32 GetImageCount() const override { return m_ImageCount; }
 		static SwapchainSupportDetails QuerySwapchainSupportDetails(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);
@@ -44,6 +48,9 @@ namespace Magma
 		u32 m_ImageCount = 0;
 		std::vector<VkImage> m_Images{};
 		std::vector<VkImageView> m_ImageViews{};
+
+		Ref<VulkanRenderPass> m_RenderPass = nullptr;
+		std::vector<Ref<VulkanFramebuffer>> m_Framebuffers{};
 	};
 }
 

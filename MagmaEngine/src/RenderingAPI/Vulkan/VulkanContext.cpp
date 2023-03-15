@@ -52,12 +52,12 @@ namespace Magma
 
 	void VulkanContext::BeginFrame()
 	{
-
+		// Begins a frame recording
 	}
 
 	void VulkanContext::EndFrame()
 	{
-
+		// Ends a frame recording
 	}
 
 	void VulkanContext::SetViewport(u32 x, u32 y, u32 width, u32 height)

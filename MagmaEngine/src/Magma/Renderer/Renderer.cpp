@@ -26,6 +26,8 @@ namespace Magma
 
 		// TEMPORARY
 		RenderPassSpecification swapchainSpec;
+		swapchainSpec.ClearValues.ClearFlags |= ClearFlags::Color;
+		swapchainSpec.ClearValues.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
 		swapchainSpec.Attachments = { AttachmentFormat::RGBA8 };
 		swapchainSpec.IsSwapchainTarget = true;
 

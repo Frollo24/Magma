@@ -8,6 +8,13 @@
 #include "Magma/Core/Log.h"
 #include "Magma/Core/Time.h"
 
+// Renderer
+#include "Magma/Renderer/Renderer.h"
+#include "Magma/Renderer/RenderCommand.h"
+#include "Magma/Renderer/GraphicsInstance.h"
+#include "Magma/Renderer/RenderDevice.h"
+#include "Magma/Renderer/RenderSwapchain.h"
+
 #ifdef MAGMA_ENTRY_POINT
 // Entry Point
 #include "Magma/Core/EntryPoint.h"

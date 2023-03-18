@@ -33,6 +33,7 @@ namespace Magma
 		inline VkDevice GetLogicalDevice() const { return m_LogicalDevice; }
 
 		inline const VulkanDeviceQueueIndices& GetQueueIndices() const { return m_QueueIndices; }
+		inline const VulkanDeviceQueueHandles& GetQueueHandles() const { return m_QueueHandles; }
 
 	private:
 		void PickPhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface, const PhysicalDeviceRequirements& requirements);

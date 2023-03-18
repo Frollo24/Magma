@@ -11,6 +11,9 @@ namespace Magma
 		VulkanFramebuffer(const FramebufferSpecification& spec, const Ref<RenderDevice>& device, const Ref<RenderPass>& renderPass);
 		virtual ~VulkanFramebuffer();
 
+		inline VkFramebuffer GetHandle() const { return m_Framebuffer; }
+		inline const VkExtent2D& GetExtent() const { return m_Extent; }
+
 	private:
 		VkDevice m_Device = VK_NULL_HANDLE;
 		VkFramebuffer m_Framebuffer = VK_NULL_HANDLE;

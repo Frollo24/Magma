@@ -21,6 +21,7 @@ namespace Magma
 
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame() = 0;
+		virtual void Present() = 0;
 
 		virtual void SetViewport(u32 x, u32 y, u32 width, u32 height) = 0;
 		virtual void SetScissor(i32 x, i32 y, u32 width, u32 height) = 0;

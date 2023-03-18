@@ -76,6 +76,7 @@ namespace Magma
 	void VulkanInstance::PresentFrame()
 	{
 		// Present an image from the swapchain to the window
+		m_Swapchain->PresentFrame();
 	}
 
 	std::vector<const char*> VulkanInstance::GetRequiredExtensions()

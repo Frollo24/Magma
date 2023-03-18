@@ -14,6 +14,7 @@ namespace Magma
 	void RenderCommand::Shutdown()
 	{
 		s_RenderContext->Shutdown();
+		s_RenderContext = nullptr;
 	}
 
 	void RenderCommand::BeginFrame()
@@ -26,6 +27,11 @@ namespace Magma
 		s_RenderContext->EndFrame();
 	}
 
+	void RenderCommand::Present()
+	{
+		s_RenderContext->Present();
+	}
+
 	void RenderCommand::SetViewport(u32 x, u32 y, u32 width, u32 height)
 	{
 		s_RenderContext->SetViewport(x, y, width, height);
@@ -34,5 +40,15 @@ namespace Magma
 	void RenderCommand::SetScissor(i32 x, i32 y, u32 width, u32 height)
 	{
 		s_RenderContext->SetScissor(x, y, width, height);
+	}
+
+	void RenderCommand::BeginRenderPass(const Ref<RenderPass>& renderPass)
+	{
+		s_RenderContext->BeginRenderPass(renderPass);
+	}
+
+	void RenderCommand::EndRenderPass(const Ref<RenderPass>& renderPass)
+	{
+		s_RenderContext->EndRenderPass(renderPass);
 	}
 }

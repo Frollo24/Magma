@@ -1,6 +1,7 @@
 #include "mgmpch.h"
 #include "VulkanSwapchain.h"
 
+#include "Magma/Renderer/RenderCommand.h"
 #include "VulkanDevice.h"
 #include "VulkanSurface.h"
 #include <GLFW/glfw3.h>
@@ -39,6 +40,11 @@ namespace Magma
 			spec.Height = m_Extent.height;
 			m_Framebuffers[i] = CreateRef<VulkanFramebuffer>(spec, device, renderPass);
 		}
+	}
+
+	void VulkanSwapchain::PresentFrame()
+	{
+		RenderCommand::Present();
 	}
 
 	SwapchainSupportDetails VulkanSwapchain::QuerySwapchainSupportDetails(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)

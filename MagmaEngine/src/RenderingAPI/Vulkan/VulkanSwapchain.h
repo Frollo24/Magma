@@ -24,6 +24,7 @@ namespace Magma
 		virtual ~VulkanSwapchain();
 
 		virtual void CreateFramebuffers(const Ref<RenderDevice>& device, const Ref<RenderPass>& renderPass) override;
+		virtual void Invalidate(void* window) override;
 		virtual void PresentFrame() override;
 
 		inline VkSwapchainKHR GetHandle() const { return m_Swapchain; }
@@ -37,20 +38,24 @@ namespace Magma
 		static SwapchainSupportDetails QuerySwapchainSupportDetails(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);
 
 	private:
-		void Create(const Ref<VulkanDevice>& device, RenderSurface& surface, void* window);
-		void RetrieveSwapchainImages();
+		void Create(const Ref<VulkanDevice>& device, void* window);
 		void Destroy();
+		void RetrieveSwapchainImages();
 
 		VkSurfaceFormatKHR ChooseSwapchainFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const;
 		VkPresentModeKHR ChooseSwapchainPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const;
 		VkExtent2D ChooseSwapchainExtent(const VkSurfaceCapabilitiesKHR& capabilities, void* window) const;
 
 	private:
-		VkDevice m_Device = VK_NULL_HANDLE;
+		VkDevice m_DeviceHandle = VK_NULL_HANDLE;
 		VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
 		VkSwapchainKHR m_Swapchain = VK_NULL_HANDLE;
+		VkSwapchainKHR m_OldSwapchain = VK_NULL_HANDLE;
 
+		VkSurfaceCapabilitiesKHR m_SurfaceCapabilities{};
 		VkSurfaceFormatKHR m_SurfaceFormat{};
+		VkPresentModeKHR m_PresentMode = VK_PRESENT_MODE_MAX_ENUM_KHR;
+		VkSharingMode m_SharingMode = VK_SHARING_MODE_MAX_ENUM;
 		VkExtent2D m_Extent{};
 
 		u32 m_ImageIndex = 0;
@@ -58,6 +63,7 @@ namespace Magma
 		std::vector<VkImage> m_Images{};
 		std::vector<VkImageView> m_ImageViews{};
 
+		Ref<VulkanDevice> m_RenderDevice = nullptr;
 		Ref<VulkanRenderPass> m_RenderPass = nullptr;
 		std::vector<Ref<VulkanFramebuffer>> m_Framebuffers{};
 	};

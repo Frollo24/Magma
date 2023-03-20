@@ -30,6 +30,8 @@ namespace Magma
 
 		// Window attributes
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+		virtual void SetMinimized(bool minimized) = 0;
+		virtual bool IsMinimized() const = 0;
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 

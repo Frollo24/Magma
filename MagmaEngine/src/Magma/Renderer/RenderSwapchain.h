@@ -13,6 +13,7 @@ namespace Magma
 		virtual ~RenderSwapchain() = default;
 
 		virtual void CreateFramebuffers(const Ref<RenderDevice>& device, const Ref<RenderPass>& renderPass) = 0;
+		virtual void Invalidate(void* window) = 0;
 		virtual void PresentFrame() = 0;
 
 		inline virtual u32 GetImageCount() const = 0;

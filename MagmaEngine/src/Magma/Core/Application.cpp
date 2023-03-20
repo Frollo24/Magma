@@ -52,6 +52,7 @@ namespace Magma
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(MGM_BIND_EVENT_FN(Application::OnWindowClose));
+		dispatcher.Dispatch<WindowResizeEvent>(MGM_BIND_EVENT_FN(Application::OnWindowResize));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
@@ -75,5 +76,17 @@ namespace Magma
 		MGM_CORE_WARN("{0}", e);
 		m_Running = false;
 		return true;
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			m_Window->SetMinimized(true);
+			return false;
+		}
+
+		m_Window->SetMinimized(false);
+		return false;
 	}
 }

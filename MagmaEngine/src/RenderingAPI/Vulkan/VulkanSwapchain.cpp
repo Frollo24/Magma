@@ -9,22 +9,25 @@
 namespace Magma
 {
 	VulkanSwapchain::VulkanSwapchain(const Ref<RenderDevice>& device, RenderSurface& surface, void* window)
-		: m_Device(DynamicCast<VulkanDevice>(device)->GetLogicalDevice()), m_Surface(dynamic_cast<VulkanSurface*>(&surface)->GetHandle())
+		: m_DeviceHandle(DynamicCast<VulkanDevice>(device)->GetLogicalDevice()), m_Surface(dynamic_cast<VulkanSurface*>(&surface)->GetHandle())
 	{
-		const auto& vulkanDevice = DynamicCast<VulkanDevice>(device);
-		Create(vulkanDevice, surface, window);
+		m_RenderDevice = DynamicCast<VulkanDevice>(device);
+		Create(m_RenderDevice, window);
 	}
 
 	VulkanSwapchain::VulkanSwapchain(const Ref<RenderDevice>& device, const Scope<RenderSurface>& surface, void* window)
-		: m_Device(DynamicCast<VulkanDevice>(device)->GetLogicalDevice()), m_Surface(dynamic_cast<VulkanSurface*>(surface.get())->GetHandle())
+		: m_DeviceHandle(DynamicCast<VulkanDevice>(device)->GetLogicalDevice()), m_Surface(dynamic_cast<VulkanSurface*>(surface.get())->GetHandle())
 	{
-		const auto& vulkanDevice = DynamicCast<VulkanDevice>(device);
-		Create(vulkanDevice, *surface.get(), window);
+		m_RenderDevice = DynamicCast<VulkanDevice>(device);
+		Create(m_RenderDevice, window);
 	}
 
 	VulkanSwapchain::~VulkanSwapchain()
 	{
 		Destroy();
+		vkDestroySwapchainKHR(m_DeviceHandle, m_OldSwapchain, nullptr);
+		vkDestroySwapchainKHR(m_DeviceHandle, m_Swapchain, nullptr);
+		m_RenderPass = nullptr;
 	}
 
 	void VulkanSwapchain::CreateFramebuffers(const Ref<RenderDevice>& device, const Ref<RenderPass>& renderPass)
@@ -35,11 +38,21 @@ namespace Magma
 		for (size_t i = 0; i < m_ImageCount; i++) {
 			FramebufferSpecification spec;
 			spec.ImageViews.push_back(m_ImageViews[i]);
-			spec.TextureSpecs = {{ FramebufferTextureFormat::RGBA8 }};
+			spec.TextureSpecs = { { FramebufferTextureFormat::RGBA8 } };
 			spec.Width = m_Extent.width;
 			spec.Height = m_Extent.height;
 			m_Framebuffers[i] = CreateRef<VulkanFramebuffer>(spec, device, renderPass);
 		}
+	}
+
+	void VulkanSwapchain::Invalidate(void* window)
+	{
+		vkDeviceWaitIdle(m_DeviceHandle);
+
+		m_OldSwapchain = m_Swapchain;
+		Destroy();
+		Create(m_RenderDevice, window);
+		CreateFramebuffers(m_RenderDevice, m_RenderPass);
 	}
 
 	void VulkanSwapchain::PresentFrame()
@@ -70,7 +83,7 @@ namespace Magma
 		return details;
 	}
 
-	void VulkanSwapchain::Create(const Ref<VulkanDevice>& device, RenderSurface& surface, void* window)
+	void VulkanSwapchain::Create(const Ref<VulkanDevice>& device, void* window)
 	{
 		const auto& swapchainSupport = QuerySwapchainSupportDetails(device->GetPhysicalDevice(), m_Surface);
 
@@ -78,7 +91,9 @@ namespace Magma
 		VkPresentModeKHR presentMode = ChooseSwapchainPresentMode(swapchainSupport.PresentModes);
 		VkExtent2D imageExtent = ChooseSwapchainExtent(swapchainSupport.SurfaceCapabilities, window);
 
+		m_SurfaceCapabilities = swapchainSupport.SurfaceCapabilities;
 		m_SurfaceFormat = surfaceFormat;
+		m_PresentMode = presentMode;
 		m_Extent = imageExtent;
 
 		u32 imageCount = swapchainSupport.SurfaceCapabilities.minImageCount + 1;
@@ -109,15 +124,16 @@ namespace Magma
 			createInfo.queueFamilyIndexCount = 0; // Optional
 			createInfo.pQueueFamilyIndices = nullptr; // Optional
 		}
+		m_SharingMode = createInfo.imageSharingMode;
 
 		createInfo.preTransform = swapchainSupport.SurfaceCapabilities.currentTransform;
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
 
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = m_OldSwapchain;
 
-		VkResult result = vkCreateSwapchainKHR(m_Device, &createInfo, nullptr, &m_Swapchain);
+		VkResult result = vkCreateSwapchainKHR(m_DeviceHandle, &createInfo, nullptr, &m_Swapchain);
 		MGM_CORE_VERIFY(result == VK_SUCCESS);
 		MGM_CORE_INFO("Successfully created Render Swapchain!");
 
@@ -129,11 +145,11 @@ namespace Magma
 		using namespace std::string_literals;
 
 		u32 imageCount = 0;
-		vkGetSwapchainImagesKHR(m_Device, m_Swapchain, &imageCount, nullptr);
+		vkGetSwapchainImagesKHR(m_DeviceHandle, m_Swapchain, &imageCount, nullptr);
 		m_ImageCount = imageCount;
 		m_Images.resize(imageCount);
 		m_ImageViews.resize(imageCount);
-		vkGetSwapchainImagesKHR(m_Device, m_Swapchain, &imageCount, m_Images.data());
+		vkGetSwapchainImagesKHR(m_DeviceHandle, m_Swapchain, &imageCount, m_Images.data());
 
 		for (size_t i = 0; i < imageCount; i++)
 		{
@@ -154,7 +170,7 @@ namespace Magma
 			createInfo.subresourceRange.baseArrayLayer = 0;
 			createInfo.subresourceRange.layerCount = 1;
 
-			VkResult result = vkCreateImageView(m_Device, &createInfo, nullptr, &m_ImageViews[i]);
+			VkResult result = vkCreateImageView(m_DeviceHandle, &createInfo, nullptr, &m_ImageViews[i]);
 			MGM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create imageview "s + std::to_string(i + 1) + " of " + std::to_string(m_ImageViews.size()) + "!");
 		}
 	}
@@ -163,12 +179,9 @@ namespace Magma
 	{
 		for (auto& framebuffer : m_Framebuffers)
 			framebuffer = nullptr;
-		m_RenderPass = nullptr;
 
 		for (const auto& imageView : m_ImageViews)
-			vkDestroyImageView(m_Device, imageView, nullptr);
-
-		vkDestroySwapchainKHR(m_Device, m_Swapchain, nullptr);
+			vkDestroyImageView(m_DeviceHandle, imageView, nullptr);
 	}
 
 	VkSurfaceFormatKHR VulkanSwapchain::ChooseSwapchainFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const
@@ -181,6 +194,8 @@ namespace Magma
 	}
 	VkPresentModeKHR VulkanSwapchain::ChooseSwapchainPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const
 	{
+		return VK_PRESENT_MODE_FIFO_KHR;
+
 		for (const auto& presentMode : availablePresentModes)
 			if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
 				return presentMode;

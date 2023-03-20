@@ -28,6 +28,7 @@ namespace Magma
 
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 
 		static Application* s_Instance;
 		bool m_Running = true;

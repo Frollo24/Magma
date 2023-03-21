@@ -30,8 +30,8 @@ namespace Magma
 		inline VkSwapchainKHR GetHandle() const { return m_Swapchain; }
 		inline const Ref<VulkanFramebuffer>& GetFramebuffer(u32 index) const { return m_Framebuffers[index]; }
 		inline const VkExtent2D& GetExtent() const { return m_Extent; }
-		inline virtual const Ref<RenderPass>& GetMainRenderPass() const override { return m_RenderPass; }
-		inline virtual u32 GetImageCount() const override { return m_ImageCount; }
+		inline Ref<RenderPass> GetMainRenderPass() const override { return m_RenderPass; }
+		inline u32 GetImageCount() const override { return m_ImageCount; }
 
 		inline const u32& GetImageIndex() const { return m_ImageIndex; }
 		inline void SetImageIndex(const u32& imageIndex) { m_ImageIndex = imageIndex; }

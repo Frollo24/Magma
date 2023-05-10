@@ -23,6 +23,9 @@ namespace Magma
 		virtual void BeginRenderPass(const Ref<RenderPass>& renderPass) override;
 		virtual void EndRenderPass(const Ref<RenderPass>& renderPass) override;
 
+		virtual void BindPipeline(const Ref<Pipeline>& pipeline) override;
+		virtual void DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex = 0, u32 firstInstance = 0) override;
+
 	private:
 		VkCommandPool m_CommandPool = VK_NULL_HANDLE;
 		std::vector<VkCommandBuffer> m_CommandBuffers{};

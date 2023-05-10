@@ -20,6 +20,9 @@ namespace Magma
 		static void BeginRenderPass(const Ref<RenderPass>& renderPass);
 		static void EndRenderPass(const Ref<RenderPass>& renderPass);
 
+		static void BindPipeline(const Ref<Pipeline>& pipeline);
+		static void DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
+
 	private:
 		static Scope<RenderContext> s_RenderContext;
 	};

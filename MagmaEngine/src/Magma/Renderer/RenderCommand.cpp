@@ -51,4 +51,14 @@ namespace Magma
 	{
 		s_RenderContext->EndRenderPass(renderPass);
 	}
+
+	void RenderCommand::BindPipeline(const Ref<Pipeline>& pipeline)
+	{
+		s_RenderContext->BindPipeline(pipeline);
+	}
+
+	void RenderCommand::DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
+	{
+		s_RenderContext->DrawVertices(vertexCount, instanceCount, firstVertex, firstInstance);
+	}
 }

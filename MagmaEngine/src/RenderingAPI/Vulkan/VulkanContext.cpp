@@ -4,6 +4,7 @@
 #include "VulkanInstance.h"
 #include "VulkanDevice.h"
 #include "VulkanSwapchain.h"
+#include "VulkanPipeline.h"
 
 #include "Magma/Core/Application.h"
 
@@ -264,5 +265,18 @@ namespace Magma
 		if (s_FrameData[m_CurrentFrame].ImageAcquireResult == VK_ERROR_OUT_OF_DATE_KHR) return;
 
 		vkCmdEndRenderPass(m_ActiveCommandBuffer);
+	}
+
+	void VulkanContext::BindPipeline(const Ref<Pipeline>& pipeline)
+	{
+		const Ref<VulkanPipeline> vkPipeline = DynamicCast<VulkanPipeline>(pipeline);
+		VkPipeline handle = vkPipeline->GetHandle();
+		VkPipelineBindPoint bindPoint = vkPipeline->GetBindPoint();
+		vkCmdBindPipeline(m_ActiveCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+	}
+
+	void VulkanContext::DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
+	{
+		vkCmdDraw(m_ActiveCommandBuffer, vertexCount, instanceCount, firstVertex, firstVertex);
 	}
 }

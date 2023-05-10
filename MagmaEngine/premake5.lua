@@ -35,7 +35,8 @@ project "MagmaEngine"
 	links
 	{
 		"GLFW",
-		"%{Libraries.Vulkan}"
+		"%{Libraries.Vulkan}",
+		"%{Libraries.ShaderC}"
 	}
 
 	filter "system:windows"

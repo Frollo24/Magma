@@ -6,7 +6,7 @@ class SandboxLayer : public Magma::Layer
 {
 public:
 	SandboxLayer();
-	virtual ~SandboxLayer() = default;
+	virtual ~SandboxLayer();
 
 	void OnUpdate() override;
 	void OnEvent(Magma::Event& event) override;

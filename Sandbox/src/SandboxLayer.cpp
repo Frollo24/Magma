@@ -16,6 +16,12 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	s_Pipeline = Magma::Pipeline::Create(spec, device, renderPass);
 }
 
+SandboxLayer::~SandboxLayer()
+{
+	s_Pipeline = nullptr;
+	s_Shader = nullptr;
+}
+
 void SandboxLayer::OnUpdate()
 {
 	// TEMPORARY

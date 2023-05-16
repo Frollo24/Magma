@@ -22,6 +22,8 @@ namespace Magma
 	{
 		Renderer::Shutdown();
 
+		m_LayerStack.Clear();
+
 		WindowSystem::Destroy(m_Window);
 		WindowSystem::Shutdown();
 		s_Instance = nullptr;

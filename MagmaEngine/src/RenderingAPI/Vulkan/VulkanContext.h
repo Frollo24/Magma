@@ -24,7 +24,12 @@ namespace Magma
 		virtual void EndRenderPass(const Ref<RenderPass>& renderPass) override;
 
 		virtual void BindPipeline(const Ref<Pipeline>& pipeline) override;
+		virtual void BindVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
+		virtual void BindIndexBuffer(const Ref<IndexBuffer>& indexBuffer) override;
 		virtual void DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex = 0, u32 firstInstance = 0) override;
+		virtual void DrawIndices(u32 indexCount, u32 instanceCount, u32 firstIndex = 0, u32 firstInstance = 0, i32 vertexOffset = 0) override;
+
+		inline const VkCommandPool& GetCommandPool() { return m_CommandPool; }
 
 	private:
 		VkCommandPool m_CommandPool = VK_NULL_HANDLE;

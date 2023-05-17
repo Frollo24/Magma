@@ -5,6 +5,8 @@
 #include "VulkanDevice.h"
 #include "VulkanSwapchain.h"
 #include "VulkanPipeline.h"
+#include "VulkanVertexBuffer.h"
+#include "VulkanIndexBuffer.h"
 
 #include "Magma/Core/Application.h"
 
@@ -275,8 +277,27 @@ namespace Magma
 		vkCmdBindPipeline(m_ActiveCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
 	}
 
+	void VulkanContext::BindVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	{
+		VkBuffer buffers[] = { DynamicCast<VulkanVertexBuffer>(vertexBuffer)->GetHandle() };
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(m_ActiveCommandBuffer, 0, 1, buffers, offsets);
+	}
+
+	void VulkanContext::BindIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
+	{
+		VkBuffer buffer = DynamicCast<VulkanIndexBuffer>(indexBuffer)->GetHandle();
+		VkIndexType indexType = IndexSizeToVkIndexType(indexBuffer->GetIndexSize());
+		vkCmdBindIndexBuffer(m_ActiveCommandBuffer, buffer, 0, indexType);
+	}
+
 	void VulkanContext::DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
 	{
 		vkCmdDraw(m_ActiveCommandBuffer, vertexCount, instanceCount, firstVertex, firstVertex);
+	}
+
+	void VulkanContext::DrawIndices(u32 indexCount, u32 instanceCount, u32 firstIndex, u32 firstInstance, i32 vertexOffset)
+	{
+		vkCmdDrawIndexed(m_ActiveCommandBuffer, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 	}
 }

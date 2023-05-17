@@ -79,7 +79,7 @@ namespace Magma
 		switch (shaderType)
 		{
 			case ShaderType::None:			return (VkShaderStageFlagBits)0;
-			case ShaderType::Vertex:			return VK_SHADER_STAGE_VERTEX_BIT;
+			case ShaderType::Vertex:		return VK_SHADER_STAGE_VERTEX_BIT;
 			case ShaderType::Fragment:		return VK_SHADER_STAGE_FRAGMENT_BIT;
 
 			default:

@@ -57,8 +57,23 @@ namespace Magma
 		s_RenderContext->BindPipeline(pipeline);
 	}
 
+	void RenderCommand::BindVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	{
+		s_RenderContext->BindVertexBuffer(vertexBuffer);
+	}
+
+	void RenderCommand::BindIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
+	{
+		s_RenderContext->BindIndexBuffer(indexBuffer);
+	}
+
 	void RenderCommand::DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
 	{
 		s_RenderContext->DrawVertices(vertexCount, instanceCount, firstVertex, firstInstance);
+	}
+
+	void RenderCommand::DrawIndices(u32 indexCount, u32 instanceCount, u32 firstIndex, u32 firstInstance, i32 vertexOffset)
+	{
+		s_RenderContext->DrawIndices(indexCount, instanceCount, firstIndex, firstInstance, vertexOffset);
 	}
 }

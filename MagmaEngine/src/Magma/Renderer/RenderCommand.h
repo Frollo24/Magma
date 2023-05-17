@@ -21,9 +21,13 @@ namespace Magma
 		static void EndRenderPass(const Ref<RenderPass>& renderPass);
 
 		static void BindPipeline(const Ref<Pipeline>& pipeline);
+		static void BindVertexBuffer(const Ref<VertexBuffer>& vertexBuffer);
+		static void BindIndexBuffer(const Ref<IndexBuffer>& indexBuffer);
 		static void DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
+		static void DrawIndices(u32 indexCount, u32 instanceCount, u32 firstIndex, u32 firstInstance, i32 vertexOffset = 0);
 
 	private:
+		friend class RenderContext;
 		static Scope<RenderContext> s_RenderContext;
 	};
 }

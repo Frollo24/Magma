@@ -1,5 +1,6 @@
 #include "mgmpch.h"
 #include "RenderContext.h"
+#include "RenderCommand.h"
 
 #include "RenderingAPI/Vulkan/VulkanContext.h"
 
@@ -16,5 +17,10 @@ namespace Magma
 		}
 
 		MGM_CORE_ASSERT(false, "Unknown render API!"); return nullptr;
+	}
+
+	const Scope<RenderContext>& RenderContext::Instance()
+	{
+		return RenderCommand::s_RenderContext;
 	}
 }

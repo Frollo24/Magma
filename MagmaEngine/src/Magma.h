@@ -8,6 +8,9 @@
 #include "Magma/Core/Log.h"
 #include "Magma/Core/Time.h"
 
+// Elements
+#include "Magma/Elements/Model.h"
+
 // Renderer
 #include "Magma/Renderer/Renderer.h"
 #include "Magma/Renderer/RenderCommand.h"

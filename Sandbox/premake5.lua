@@ -26,6 +26,11 @@ project "Sandbox"
 		"MagmaEngine"
 	}
 
+	postbuildcommands
+	{
+		"{COPYDIR} \"%{prj.location}assets\" \"../" .. outputbindir .. "/Sandbox/assets" .. "/\""
+	}
+
 	filter "system:windows"
 		systemversion "latest"
 

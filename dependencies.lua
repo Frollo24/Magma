@@ -4,6 +4,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "%{wks.location}/MagmaEngine/vendor/GLFW/include"
 IncludeDir["glm"] = "%{wks.location}/MagmaEngine/vendor/glm"
 IncludeDir["Vulkan"] = "%{VULKAN_SDK}/Include"
+IncludeDir["tiny_obj_loader"] = "%{wks.location}/MagmaEngine/vendor/tiny_obj_loader"
 
 LibraryDirs = {}
 LibraryDirs["Vulkan"] = "%{VULKAN_SDK}/Lib"

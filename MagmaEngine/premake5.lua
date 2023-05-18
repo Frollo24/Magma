@@ -15,7 +15,9 @@ project "MagmaEngine"
 		"src/**.h",
 		"src/**.cpp",
 		"vendor/glm/glm/**.hpp",
-		"vendor/glm/glm/**.inl"
+		"vendor/glm/glm/**.inl",
+		"vendor/tiny_obj_loader/tiny_obj_loader.h",
+		"vendor/tiny_obj_loader/tiny_obj_loader.cpp"
 	}
 
 	includedirs
@@ -24,7 +26,8 @@ project "MagmaEngine"
 		"vendor/spdlog/include/",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.Vulkan}"
+		"%{IncludeDir.Vulkan}",
+		"%{IncludeDir.tiny_obj_loader}"
 	}
 
 	libdirs

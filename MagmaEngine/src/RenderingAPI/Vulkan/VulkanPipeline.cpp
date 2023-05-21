@@ -182,6 +182,17 @@ namespace Magma
 		pipelineLayoutInfo.pushConstantRangeCount = 0;
 		pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
+		VkPushConstantRange pushRange{};
+		if (m_Specification.GlobalDataLayout.PushConstantSize)
+		{
+			pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+			pushRange.offset = 0;
+			pushRange.size = m_Specification.GlobalDataLayout.PushConstantSize;
+
+			pipelineLayoutInfo.pushConstantRangeCount = 1;
+			pipelineLayoutInfo.pPushConstantRanges = &pushRange;
+		}
+
 		VkResult result = vkCreatePipelineLayout(m_Device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout);
 		MGM_CORE_VERIFY(result == VK_SUCCESS);
 

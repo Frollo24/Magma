@@ -14,6 +14,11 @@ namespace Magma
 		Graphics
 	};
 
+	struct GlobalDataLayout
+	{
+		u32 PushConstantSize = 0;
+	};
+
 	struct PipelineSpecification
 	{
 		PipelineType PipelineType = PipelineType::Graphics;
@@ -21,6 +26,7 @@ namespace Magma
 		PipelineBlendState PipelineBlendState{};
 		PipelinePolygonState PipelinePolygonState{};
 		InputElementsLayout InputElementsLayout{};
+		GlobalDataLayout GlobalDataLayout{};
 
 		Ref<Shader> Shader = nullptr;
 	};

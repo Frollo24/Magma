@@ -26,6 +26,7 @@ namespace Magma
 		virtual void BindPipeline(const Ref<Pipeline>& pipeline) override;
 		virtual void BindVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
 		virtual void BindIndexBuffer(const Ref<IndexBuffer>& indexBuffer) override;
+		virtual void UploadConstantData(const Ref<Pipeline>& pipeline, const u32 size, const void* data) override;
 		virtual void DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex = 0, u32 firstInstance = 0) override;
 		virtual void DrawIndices(u32 indexCount, u32 instanceCount, u32 firstIndex = 0, u32 firstInstance = 0, i32 vertexOffset = 0) override;
 

@@ -291,6 +291,12 @@ namespace Magma
 		vkCmdBindIndexBuffer(m_ActiveCommandBuffer, buffer, 0, indexType);
 	}
 
+	void VulkanContext::UploadConstantData(const Ref<Pipeline>& pipeline, const u32 size, const void* data)
+	{
+		VkPipelineLayout layout = DynamicCast<VulkanPipeline>(pipeline)->GetLayout();
+		vkCmdPushConstants(m_ActiveCommandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, data);
+	}
+
 	void VulkanContext::DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
 	{
 		vkCmdDraw(m_ActiveCommandBuffer, vertexCount, instanceCount, firstVertex, firstVertex);

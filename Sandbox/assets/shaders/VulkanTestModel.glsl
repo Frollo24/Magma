@@ -10,8 +10,14 @@ layout(location = 4) in vec3 a_Bitangent;
 
 layout(location = 0) out vec3 v_Normal;
 
+layout(push_constant) uniform Push{
+	mat4 viewProj;
+	vec4 tint;
+	vec3 offset;
+} push;
+
 void main() {
-	gl_Position = vec4(a_Position, 1.0);
+	gl_Position = push.viewProj * vec4(a_Position + push.offset, 1.0);
 	v_Normal = a_Normal;
 }
 
@@ -22,7 +28,13 @@ layout(location = 0) in vec3 v_Normal;
 
 layout(location = 0) out vec4 o_Color;
 
+layout(push_constant) uniform Push{
+	mat4 viewProj;
+	vec4 tint;
+	vec3 offset;
+} push;
+
 void main() {
 	vec3 normColor = v_Normal * 0.5 + 0.5;
-	o_Color = vec4(normColor, 1.0);
+	o_Color = vec4(normColor * push.tint.rgb, 1.0);
 }

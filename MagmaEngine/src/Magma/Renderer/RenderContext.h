@@ -35,6 +35,7 @@ namespace Magma
 		virtual void BindPipeline(const Ref<Pipeline>& pipeline) = 0;
 		virtual void BindVertexBuffer(const Ref<VertexBuffer>& pipeline) = 0;
 		virtual void BindIndexBuffer(const Ref<IndexBuffer>& pipeline) = 0;
+		virtual void UploadConstantData(const Ref<Pipeline>& pipeline, const u32 size, const void* data) = 0;
 		virtual void DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance) = 0;
 		virtual void DrawIndices(u32 indexCount, u32 instanceCount, u32 firstIndex, u32 firstInstance, i32 vertexOffset = 0) = 0;
 

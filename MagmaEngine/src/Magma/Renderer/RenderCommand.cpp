@@ -67,6 +67,11 @@ namespace Magma
 		s_RenderContext->BindIndexBuffer(indexBuffer);
 	}
 
+	void RenderCommand::UploadConstantData(const Ref<Pipeline>& pipeline, const u32 size, const void* data)
+	{
+		s_RenderContext->UploadConstantData(pipeline, size, data);
+	}
+
 	void RenderCommand::DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
 	{
 		s_RenderContext->DrawVertices(vertexCount, instanceCount, firstVertex, firstInstance);

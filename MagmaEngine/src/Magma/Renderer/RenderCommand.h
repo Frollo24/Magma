@@ -23,6 +23,7 @@ namespace Magma
 		static void BindPipeline(const Ref<Pipeline>& pipeline);
 		static void BindVertexBuffer(const Ref<VertexBuffer>& vertexBuffer);
 		static void BindIndexBuffer(const Ref<IndexBuffer>& indexBuffer);
+		static void BindDescriptorSet(const Ref<DescriptorSet>& descriptorSet, const Ref<Pipeline>& pipeline, u32 firstSet);
 		static void UploadConstantData(const Ref<Pipeline>& pipeline, const u32 size, const void* data);
 		static void DrawVertices(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
 		static void DrawIndices(u32 indexCount, u32 instanceCount, u32 firstIndex, u32 firstInstance, i32 vertexOffset = 0);

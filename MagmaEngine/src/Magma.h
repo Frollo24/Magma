@@ -17,6 +17,7 @@
 #include "Magma/Renderer/GraphicsInstance.h"
 #include "Magma/Renderer/RenderDevice.h"
 #include "Magma/Renderer/RenderSwapchain.h"
+#include "Magma/Renderer/Descriptors.h"
 
 #ifdef MAGMA_ENTRY_POINT
 // Entry Point

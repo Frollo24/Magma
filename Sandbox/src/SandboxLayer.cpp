@@ -8,9 +8,34 @@ static Magma::Ref<Magma::Pipeline> s_Pipeline = nullptr;
 static Magma::Ref<Magma::Model> s_Model = nullptr;
 static glm::mat4 s_ViewProj;
 
+static Magma::Ref<Magma::DescriptorSetLayout> s_DescriptorLayout = nullptr;
+static Magma::Ref<Magma::DescriptorPool> s_DescriptorPool = nullptr;
+static Magma::Ref<Magma::DescriptorSet> s_DescriptorSet = nullptr;
+static Magma::Ref<Magma::UniformBuffer> s_UniformBuffer = nullptr;
+
+struct TestConstantData
+{
+	// glm::mat4 viewProj;
+	glm::vec4 tintColor;
+	glm::vec3 posOffset;
+};
+
 SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 {
-	s_Shader = Magma::Shader::Create("assets/shaders/VulkanTestModel.glsl");
+	const auto& instance = Magma::Application::Instance().GetWindow().GetGraphicsInstance();
+	const auto& device = instance->GetDevice();
+
+	Magma::DescriptorBinding matrixTransform{ Magma::DescriptorType::UniformBuffer, 0 };
+	Magma::DescriptorSetLayoutSpecification layoutSpec{};
+	layoutSpec.Bindings = { matrixTransform };
+	s_DescriptorLayout = Magma::DescriptorSetLayout::Create(layoutSpec, device);
+	s_DescriptorPool = Magma::DescriptorPool::Create(device);
+	s_DescriptorSet = Magma::DescriptorSet::Create(device, s_DescriptorLayout, s_DescriptorPool);
+
+	s_UniformBuffer = Magma::UniformBuffer::Create(device, sizeof(glm::mat4), 0, 2);
+	s_DescriptorSet->WriteUniformBuffer(s_UniformBuffer, sizeof(glm::mat4));
+
+	s_Shader = Magma::Shader::Create("assets/shaders/VulkanTestDescriptors.glsl");
 	Magma::PipelineSpecification spec{};
 	spec.InputElementsLayout = {
 		{Magma::ShaderDataType::Float3, "a_Position"},
@@ -19,10 +44,10 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 		{Magma::ShaderDataType::Float3, "a_Tangent"},
 		{Magma::ShaderDataType::Float3, "a_Bitangent"},
 	};
+	spec.GlobalDataLayout.DescriptorLayouts.push_back(s_DescriptorLayout);
+	spec.GlobalDataLayout.ConstantDataSize = sizeof(TestConstantData);
 	spec.Shader = s_Shader;
 
-	const auto& instance = Magma::Application::Instance().GetWindow().GetGraphicsInstance();
-	const auto& device = instance->GetDevice();
 	const auto& renderPass = instance->GetSwapchain()->GetMainRenderPass();
 	s_Pipeline = Magma::Pipeline::Create(spec, device, renderPass);
 
@@ -30,10 +55,16 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 
 	s_ViewProj = glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.1f, 25.0f)
 		* glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	s_UniformBuffer->SetCommonDataForAllFrames(&s_ViewProj, sizeof(glm::mat4));
 }
 
 SandboxLayer::~SandboxLayer()
 {
+	s_UniformBuffer = nullptr;
+	s_DescriptorSet = nullptr;
+	s_DescriptorPool = nullptr;
+	s_DescriptorLayout = nullptr;
+
 	s_Model = nullptr;
 	s_Pipeline = nullptr;
 	s_Shader = nullptr;
@@ -45,20 +76,19 @@ void SandboxLayer::OnUpdate()
 	const auto& window = Magma::Application::Instance().GetWindow();
 	const auto& renderPass = window.GetGraphicsInstance()->GetSwapchain()->GetMainRenderPass();
 
-	struct TestConstantData
-	{
-		glm::mat4 viewProj;
-		glm::vec4 tintColor;
-		glm::vec3 posOffset;
-	};
-
 	TestConstantData data{};
-	data.viewProj = s_ViewProj;
+	// data.viewProj = s_ViewProj;
+
+	auto& lookAt = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	auto& rotate = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f * (float)Magma::Time::TotalTime), glm::vec3(1.0f, 0.0f, 0.0f));
+	s_ViewProj = glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.1f, 25.0f) * rotate * lookAt;
+	s_UniformBuffer->SetData(&s_ViewProj, sizeof(glm::mat4));
 
 	Magma::RenderCommand::BeginRenderPass(renderPass);
 	Magma::RenderCommand::SetViewport(0, 0, window.GetWidth(), window.GetHeight());
 	Magma::RenderCommand::SetScissor(0, 0, window.GetWidth(), window.GetHeight());
 	Magma::RenderCommand::BindPipeline(s_Pipeline);
+	Magma::RenderCommand::BindDescriptorSet(s_DescriptorSet, s_Pipeline, 0);
 	{
 		data.tintColor = glm::vec4(0.5f, 0.3f, 0.2f, 1.0f);
 		data.posOffset = glm::vec4(-1.0f);

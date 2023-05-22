@@ -1,6 +1,7 @@
 #include "mgmpch.h"
 #include "VulkanPipeline.h"
 #include "VulkanShader.h"
+#include "VulkanDescriptors.h"
 
 namespace Magma
 {
@@ -182,12 +183,31 @@ namespace Magma
 		pipelineLayoutInfo.pushConstantRangeCount = 0;
 		pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
+		std::vector<VkDescriptorSetLayout> layouts;
+		layouts.reserve(3);
+
+		if (m_Specification.GlobalDataLayout.DescriptorLayouts.size())
+		{
+			for (const auto& descriptorLayout : m_Specification.GlobalDataLayout.DescriptorLayouts)
+			{
+				VkDescriptorSetLayout layout = VK_NULL_HANDLE;
+				layout = DynamicCast<VulkanDescriptorSetLayout>(descriptorLayout)->GetHandle();
+				layouts.push_back(layout);
+			}
+		}
+
+		if (layouts.size())
+		{
+			pipelineLayoutInfo.setLayoutCount = static_cast<u32>(layouts.size());
+			pipelineLayoutInfo.pSetLayouts = layouts.data();
+		}
+
 		VkPushConstantRange pushRange{};
-		if (m_Specification.GlobalDataLayout.PushConstantSize)
+		if (m_Specification.GlobalDataLayout.ConstantDataSize)
 		{
 			pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 			pushRange.offset = 0;
-			pushRange.size = m_Specification.GlobalDataLayout.PushConstantSize;
+			pushRange.size = m_Specification.GlobalDataLayout.ConstantDataSize;
 
 			pipelineLayoutInfo.pushConstantRangeCount = 1;
 			pipelineLayoutInfo.pPushConstantRanges = &pushRange;

@@ -67,6 +67,11 @@ namespace Magma
 		s_RenderContext->BindIndexBuffer(indexBuffer);
 	}
 
+	void RenderCommand::BindDescriptorSet(const Ref<DescriptorSet>& descriptorSet, const Ref<Pipeline>& pipeline, u32 firstSet)
+	{
+		s_RenderContext->BindDescriptorSet(descriptorSet, pipeline, firstSet);
+	}
+
 	void RenderCommand::UploadConstantData(const Ref<Pipeline>& pipeline, const u32 size, const void* data)
 	{
 		s_RenderContext->UploadConstantData(pipeline, size, data);

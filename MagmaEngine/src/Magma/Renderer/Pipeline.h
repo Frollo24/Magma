@@ -4,6 +4,7 @@
 #include "Magma/Renderer/RenderDevice.h"
 #include "Magma/Renderer/RenderPass.h"
 #include "Magma/Renderer/Shader.h"
+#include "Magma/Renderer/Descriptors.h"
 #include "Magma/Renderer/PipelineState.h"
 #include "Magma/Renderer/InputElementsLayout.h"
 
@@ -16,7 +17,8 @@ namespace Magma
 
 	struct GlobalDataLayout
 	{
-		u32 PushConstantSize = 0;
+		std::vector<Ref<DescriptorSetLayout>> DescriptorLayouts{};
+		u32 ConstantDataSize = 0;
 	};
 
 	struct PipelineSpecification

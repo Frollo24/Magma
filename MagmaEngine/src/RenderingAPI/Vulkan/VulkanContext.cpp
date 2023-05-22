@@ -7,6 +7,7 @@
 #include "VulkanPipeline.h"
 #include "VulkanVertexBuffer.h"
 #include "VulkanIndexBuffer.h"
+#include "VulkanDescriptors.h"
 
 #include "Magma/Core/Application.h"
 
@@ -274,7 +275,7 @@ namespace Magma
 		const Ref<VulkanPipeline> vkPipeline = DynamicCast<VulkanPipeline>(pipeline);
 		VkPipeline handle = vkPipeline->GetHandle();
 		VkPipelineBindPoint bindPoint = vkPipeline->GetBindPoint();
-		vkCmdBindPipeline(m_ActiveCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+		vkCmdBindPipeline(m_ActiveCommandBuffer, bindPoint, handle);
 	}
 
 	void VulkanContext::BindVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
@@ -289,6 +290,15 @@ namespace Magma
 		VkBuffer buffer = DynamicCast<VulkanIndexBuffer>(indexBuffer)->GetHandle();
 		VkIndexType indexType = IndexSizeToVkIndexType(indexBuffer->GetIndexSize());
 		vkCmdBindIndexBuffer(m_ActiveCommandBuffer, buffer, 0, indexType);
+	}
+
+	void VulkanContext::BindDescriptorSet(const Ref<DescriptorSet>& descriptorSet, const Ref<Pipeline>& pipeline, u32 firstSet)
+	{
+		Ref<VulkanPipeline> vkPipeline = DynamicCast<VulkanPipeline>(pipeline);
+		VkPipelineBindPoint bindPoint = vkPipeline->GetBindPoint();
+		VkPipelineLayout layout = vkPipeline->GetLayout();
+		VkDescriptorSet handle = DynamicCast<VulkanDescriptorSet>(descriptorSet)->GetHandle(m_CurrentFrame);
+		vkCmdBindDescriptorSets(m_ActiveCommandBuffer, bindPoint, layout, firstSet, 1, &handle, 0, nullptr);
 	}
 
 	void VulkanContext::UploadConstantData(const Ref<Pipeline>& pipeline, const u32 size, const void* data)

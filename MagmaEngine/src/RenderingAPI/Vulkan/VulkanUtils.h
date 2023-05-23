@@ -92,6 +92,7 @@ namespace Magma
 		VkSampleCountFlagBits numSamples;
 		VkFormat format;
 		VkImageTiling tiling;
+		u32 mipLevels = 1;
 	};
 
 	static void CreateImage(VkPhysicalDevice physicalDevice, VkDevice device, VulkanImageProperties imageProperties,
@@ -101,7 +102,7 @@ namespace Magma
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		imageInfo.imageType = imageProperties.type;
 		imageInfo.extent = imageProperties.extent;
-		imageInfo.mipLevels = 1;
+		imageInfo.mipLevels = imageProperties.mipLevels;
 		imageInfo.arrayLayers = 1;
 		imageInfo.format = imageProperties.format;
 		imageInfo.tiling = imageProperties.tiling;
@@ -163,7 +164,7 @@ namespace Magma
 		}
 	}
 
-	static void TransitionImageLayout(VkCommandBuffer transitionCommand, VkImage image, FramebufferTextureFormat format, VkImageLayout oldLayout, VkImageLayout newLayout)
+	static void TransitionImageLayout(VkCommandBuffer transitionCommand, VkImage image, FramebufferTextureFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, u32 mipLevels = 1)
 	{
 		VkImageMemoryBarrier barrier{};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -178,7 +179,7 @@ namespace Magma
 		barrier.image = image;
 		barrier.subresourceRange.aspectMask = aspectMask;
 		barrier.subresourceRange.baseMipLevel = 0;
-		barrier.subresourceRange.levelCount = 1;
+		barrier.subresourceRange.levelCount = mipLevels;
 		barrier.subresourceRange.baseArrayLayer = 0;
 		barrier.subresourceRange.layerCount = 1;
 

@@ -30,6 +30,7 @@ namespace Magma
 		virtual ~Texture() = default;
 
 		virtual void SetData(const void* data, u32 size) = 0;
+		virtual void GenerateMipmaps() = 0;
 
 		inline const TextureDimensions& GetDimensions() const { return m_Dimensions; }
 		inline void SetDimensions(const TextureDimensions& dimensions) { m_Dimensions = dimensions; }
@@ -45,7 +46,10 @@ namespace Magma
 	class MAGMA_API Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> Create(const Ref<RenderDevice>& device, const std::string& filepath);
+		static Ref<Texture2D> Create(const Ref<RenderDevice>& device, const std::string& filepath, const bool generateMipmapsOnLoad = true);
+
+	protected:
+		u32 m_MipLevels = 1;
 	};
 }
 

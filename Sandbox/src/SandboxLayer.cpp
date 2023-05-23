@@ -37,7 +37,9 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	s_UniformBuffer = Magma::UniformBuffer::Create(device, sizeof(glm::mat4), 0, 2);
 	s_DescriptorSet->WriteUniformBuffer(s_UniformBuffer, sizeof(glm::mat4));
 
-	s_Texture = Magma::Texture2D::Create(device, "assets/textures/texture-wood.jpg");
+	bool generateMipmapsOnLoad = false;
+	s_Texture = Magma::Texture2D::Create(device, "assets/textures/texture-wood.jpg", generateMipmapsOnLoad);
+	s_Texture->GenerateMipmaps();
 	s_Texture->SetBinding(1);
 	s_DescriptorSet->WriteTexture2D(s_Texture);
 

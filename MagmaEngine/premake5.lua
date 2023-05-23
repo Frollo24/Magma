@@ -16,6 +16,8 @@ project "MagmaEngine"
 		"src/**.cpp",
 		"vendor/glm/glm/**.hpp",
 		"vendor/glm/glm/**.inl",
+		"vendor/stb_image/stb_image.h",
+		"vendor/stb_image/stb_image.cpp",
 		"vendor/tiny_obj_loader/tiny_obj_loader.h",
 		"vendor/tiny_obj_loader/tiny_obj_loader.cpp"
 	}
@@ -27,6 +29,7 @@ project "MagmaEngine"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.Vulkan}",
+		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.tiny_obj_loader}"
 	}
 

@@ -12,7 +12,8 @@ namespace Magma
 	enum class FramebufferTextureFormat
 	{
 		None,
-		RGBA8
+		RGBA8,
+		Color,
 	};
 
 	struct FramebufferTextureSpecification

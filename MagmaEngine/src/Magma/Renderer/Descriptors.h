@@ -3,6 +3,7 @@
 #include "Magma/Core/Base.h"
 #include "Magma/Renderer/RenderDevice.h"
 #include "Magma/Renderer/UniformBuffer.h"
+#include "Magma/Renderer/Texture.h"
 
 namespace Magma
 {
@@ -59,6 +60,7 @@ namespace Magma
 		static Ref<DescriptorSet> Create(const Ref<RenderDevice>& device, const Ref<DescriptorSetLayout>& layout, const Ref<DescriptorPool>& pool);
 
 		virtual void WriteUniformBuffer(const Ref<UniformBuffer>& uniformBuffer, u32 size) = 0;
+		virtual void WriteTexture2D(const Ref<Texture2D>& uniformBuffer) = 0;
 
 	protected:
 		explicit DescriptorSet(const Ref<DescriptorSetLayout>& layout, const Ref<DescriptorPool>& pool) : m_Layout(layout), m_Pool(pool) {}

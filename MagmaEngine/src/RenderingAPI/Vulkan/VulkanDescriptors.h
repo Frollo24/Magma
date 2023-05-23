@@ -44,6 +44,7 @@ namespace Magma
 		inline const VkDescriptorPool& GetPool() const { return m_DescriptorPool; }
 
 		virtual void WriteUniformBuffer(const Ref<UniformBuffer>& uniformBuffer, u32 size) override;
+		virtual void WriteTexture2D(const Ref<Texture2D>& texture) override;
 
 	private:
 		void InitDescriptorSets();

@@ -12,6 +12,7 @@ static Magma::Ref<Magma::DescriptorSetLayout> s_DescriptorLayout = nullptr;
 static Magma::Ref<Magma::DescriptorPool> s_DescriptorPool = nullptr;
 static Magma::Ref<Magma::DescriptorSet> s_DescriptorSet = nullptr;
 static Magma::Ref<Magma::UniformBuffer> s_UniformBuffer = nullptr;
+static Magma::Ref<Magma::Texture2D> s_Texture = nullptr;
 
 struct TestConstantData
 {
@@ -26,14 +27,19 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	const auto& device = instance->GetDevice();
 
 	Magma::DescriptorBinding matrixTransform{ Magma::DescriptorType::UniformBuffer, 0 };
+	Magma::DescriptorBinding texture2D{ Magma::DescriptorType::ImageSampler, 1 };
 	Magma::DescriptorSetLayoutSpecification layoutSpec{};
-	layoutSpec.Bindings = { matrixTransform };
+	layoutSpec.Bindings = { matrixTransform, texture2D };
 	s_DescriptorLayout = Magma::DescriptorSetLayout::Create(layoutSpec, device);
 	s_DescriptorPool = Magma::DescriptorPool::Create(device);
 	s_DescriptorSet = Magma::DescriptorSet::Create(device, s_DescriptorLayout, s_DescriptorPool);
 
 	s_UniformBuffer = Magma::UniformBuffer::Create(device, sizeof(glm::mat4), 0, 2);
 	s_DescriptorSet->WriteUniformBuffer(s_UniformBuffer, sizeof(glm::mat4));
+
+	s_Texture = Magma::Texture2D::Create(device, "assets/textures/texture-wood.jpg");
+	s_Texture->SetBinding(1);
+	s_DescriptorSet->WriteTexture2D(s_Texture);
 
 	s_Shader = Magma::Shader::Create("assets/shaders/VulkanTestDescriptors.glsl");
 	Magma::PipelineSpecification spec{};
@@ -60,6 +66,7 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 
 SandboxLayer::~SandboxLayer()
 {
+	s_Texture = nullptr;
 	s_UniformBuffer = nullptr;
 	s_DescriptorSet = nullptr;
 	s_DescriptorPool = nullptr;

@@ -10,6 +10,7 @@ namespace Magma
 		switch (format)
 		{
 			case AttachmentFormat::RGBA8: return VK_FORMAT_R8G8B8A8_SRGB;
+			case AttachmentFormat::D24S8: return VK_FORMAT_D24_UNORM_S8_UINT;
 			default: return VK_FORMAT_UNDEFINED;
 		}
 	}
@@ -34,12 +35,44 @@ namespace Magma
 		return colorAttachment;
 	}
 
+	static VkAttachmentDescription CreateDepthAttachment(AttachmentFormat format, bool isSwapchainTarget, bool clearValue, u32 numSamples,
+		VkAttachmentReference& reference, uint32_t attachment)
+	{
+		VkAttachmentDescription depthAttachment{};
+		depthAttachment.format =
+			isSwapchainTarget ? VK_FORMAT_D24_UNORM_S8_UINT : AttachmentFormatToVkFormat(format);
+		depthAttachment.samples = (VkSampleCountFlagBits)numSamples;
+		depthAttachment.loadOp = clearValue ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD;
+		depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		depthAttachment.initialLayout = clearValue ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		reference.attachment = attachment;
+		reference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		return depthAttachment;
+	}
+
 	VulkanRenderPass::VulkanRenderPass(const RenderPassSpecification& spec, const Ref<RenderDevice>& device)
 		: RenderPass(spec), m_Device(DynamicCast<VulkanDevice>(device)->GetLogicalDevice())
 	{
 		u32 attachmentIndex = 0;
 		std::vector<VkAttachmentDescription> totalAttachmentsDescs{};
 		std::vector<VkAttachmentReference> totalAttachmentsRefs{};
+
+		std::vector<VkAttachmentDescription> colorAttachmentsDescs{};
+		std::vector<VkAttachmentReference> colorAttachmentsRefs{};
+
+		std::vector<VkAttachmentDescription> depthAttachmentsDescs{};
+		std::vector<VkAttachmentReference> depthAttachmentsRefs{};
+
+		VkAttachmentDescription depthAttachmentDesc{};
+		VkAttachmentReference depthAttachmentRef{};
+
+		bool hasDepthAttachment = false;
+
 		for (const auto& attachment : m_Specification.Attachments)
 		{
 			VkAttachmentDescription attachmentDesc{};
@@ -50,6 +83,17 @@ namespace Magma
 				case AttachmentFormat::RGBA8:
 					attachmentDesc = CreateColorAttachment(attachment, m_Specification.IsSwapchainTarget, (u8)(m_Specification.ClearValues.ClearFlags & ClearFlags::Color),
 						m_Specification.Samples, attachmentRef, attachmentIndex);
+					colorAttachmentsDescs.push_back(attachmentDesc);
+					colorAttachmentsRefs.push_back(attachmentRef);
+					break;
+				case AttachmentFormat::D24S8:
+					if (hasDepthAttachment)
+						break;
+					hasDepthAttachment = true;
+					attachmentDesc = CreateDepthAttachment(attachment, m_Specification.IsSwapchainTarget, (u8)(m_Specification.ClearValues.ClearFlags & ClearFlags::DepthStencil),
+						m_Specification.Samples, attachmentRef, attachmentIndex);
+					depthAttachmentDesc = attachmentDesc;
+					depthAttachmentRef = attachmentRef;
 					break;
 				default:
 					break;
@@ -62,8 +106,9 @@ namespace Magma
 
 		VkSubpassDescription subpass{};
 		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.colorAttachmentCount = static_cast<u32>(totalAttachmentsRefs.size());
-		subpass.pColorAttachments = totalAttachmentsRefs.data();
+		subpass.colorAttachmentCount = static_cast<u32>(colorAttachmentsRefs.size());
+		subpass.pColorAttachments = colorAttachmentsRefs.data();
+		subpass.pDepthStencilAttachment = hasDepthAttachment ? &depthAttachmentRef : nullptr;
 
 		VkSubpassDependency dependency{};
 		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;

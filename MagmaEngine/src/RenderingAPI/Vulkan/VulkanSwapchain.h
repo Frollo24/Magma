@@ -32,6 +32,8 @@ namespace Magma
 		inline const VkExtent2D& GetExtent() const { return m_Extent; }
 		inline Ref<RenderPass> GetMainRenderPass() const override { return m_RenderPass; }
 		inline u32 GetImageCount() const override { return m_ImageCount; }
+		inline virtual u32 GetWidth() const override { return m_Extent.width; }
+		inline virtual u32 GetHeight() const override { return m_Extent.height; }
 
 		inline const u32& GetImageIndex() const { return m_ImageIndex; }
 		inline void SetImageIndex(const u32& imageIndex) { m_ImageIndex = imageIndex; }

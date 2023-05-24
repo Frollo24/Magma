@@ -2,10 +2,7 @@
 
 #include "Magma/Core/Base.h"
 #include "Magma/Renderer/RenderDevice.h"
-#include "Magma/Renderer/RenderPass.h"
-
-// TEMPORARY
-#include <vulkan/vulkan.h>
+#include "Magma/Renderer/Texture.h"
 
 namespace Magma
 {
@@ -14,6 +11,8 @@ namespace Magma
 		None,
 		RGBA8,
 		Color,
+		RGBA16F,
+		Depth
 	};
 
 	struct FramebufferTextureSpecification
@@ -26,8 +25,10 @@ namespace Magma
 		u32 Width = 0;
 		u32 Height = 0;
 		std::vector<FramebufferTextureSpecification> TextureSpecs{};
-		std::vector<VkImageView> ImageViews{}; // TEMPORARY
+		std::vector<Ref<FramebufferTexture2D>> RenderTargets{};
 	};
+
+	class RenderPass;
 
 	class MAGMA_API Framebuffer
 	{

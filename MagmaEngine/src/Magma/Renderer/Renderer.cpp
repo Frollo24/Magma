@@ -13,6 +13,11 @@ namespace Magma
 	{
 		Ref<RenderDevice> RenderDevice = nullptr;
 		Ref<RenderSwapchain> RenderSwapchain = nullptr;
+		Ref<DescriptorPool> DescriptorPool = nullptr;
+		Ref<Shader> ScreenShader = nullptr;
+		Ref<Pipeline> ScreenPipeline = nullptr;
+		Ref<DescriptorSetLayout> ScreenDescriptorLayout = nullptr;
+		Ref<DescriptorSet> ScreenDescriptorSet = nullptr;
 	};
 
 	static RendererData* s_RendererData = nullptr;
@@ -33,6 +38,20 @@ namespace Magma
 
 		auto renderPass = RenderPass::Create(swapchainSpec, s_RendererData->RenderDevice);
 		s_RendererData->RenderSwapchain->CreateFramebuffers(s_RendererData->RenderDevice, renderPass);
+
+		Magma::DescriptorBinding screenTexture{ Magma::DescriptorType::ImageSampler, 0 };
+		Magma::DescriptorSetLayoutSpecification layoutSpec{};
+		layoutSpec.Bindings = { screenTexture };
+		s_RendererData->DescriptorPool = Magma::DescriptorPool::Create(s_RendererData->RenderDevice);
+		s_RendererData->ScreenDescriptorLayout = Magma::DescriptorSetLayout::Create(layoutSpec, s_RendererData->RenderDevice);
+		s_RendererData->ScreenDescriptorSet = Magma::DescriptorSet::Create(s_RendererData->RenderDevice, s_RendererData->ScreenDescriptorLayout, s_RendererData->DescriptorPool);
+
+		s_RendererData->ScreenShader = Magma::Shader::Create("assets/shaders/DrawToScreen.glsl");
+		Magma::PipelineSpecification spec{};
+		spec.GlobalDataLayout.DescriptorLayouts.push_back(s_RendererData->ScreenDescriptorLayout);
+		spec.Shader = s_RendererData->ScreenShader;
+
+		s_RendererData->ScreenPipeline = Magma::Pipeline::Create(spec, s_RendererData->RenderDevice, renderPass);
 	}
 
 	void Renderer::BeginFrame()
@@ -41,6 +60,17 @@ namespace Magma
 		s_BegunFrame = true;
 
 		RenderCommand::BeginFrame();
+	}
+
+	void Renderer::DrawToScreen()
+	{
+		auto drawToScreenPass = s_RendererData->RenderSwapchain->GetMainRenderPass();
+
+		RenderCommand::BeginRenderPass(drawToScreenPass);
+		RenderCommand::BindPipeline(s_RendererData->ScreenPipeline);
+		RenderCommand::BindDescriptorSet(s_RendererData->ScreenDescriptorSet, s_RendererData->ScreenPipeline, 0);
+		RenderCommand::DrawVertices(6, 1, 0, 0);
+		RenderCommand::EndRenderPass(drawToScreenPass);
 	}
 
 	void Renderer::EndFrame()
@@ -55,5 +85,10 @@ namespace Magma
 	{
 		delete s_RendererData;
 		RenderCommand::Shutdown();
+	}
+
+	void Renderer::SetScreenTexture(const Ref<FramebufferTexture2D>& screenTexture)
+	{
+		s_RendererData->ScreenDescriptorSet->WriteFramebufferTexture2D(screenTexture);
 	}
 }

@@ -4,6 +4,7 @@
 #include "Magma/Renderer/RenderCommand.h"
 #include "VulkanDevice.h"
 #include "VulkanSurface.h"
+#include "VulkanTexture.h"
 #include <GLFW/glfw3.h>
 
 namespace Magma
@@ -37,7 +38,7 @@ namespace Magma
 
 		for (size_t i = 0; i < m_ImageCount; i++) {
 			FramebufferSpecification spec;
-			spec.ImageViews.push_back(m_ImageViews[i]);
+			spec.RenderTargets.push_back(VulkanFramebufferTexture2D::CreateFromImageView(m_ImageViews[i]));
 			spec.TextureSpecs = { { FramebufferTextureFormat::RGBA8 } };
 			spec.Width = m_Extent.width;
 			spec.Height = m_Extent.height;

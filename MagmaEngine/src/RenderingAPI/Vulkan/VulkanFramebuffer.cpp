@@ -3,6 +3,7 @@
 
 #include "VulkanDevice.h"
 #include "VulkanRenderPass.h"
+#include "VulkanTexture.h"
 
 namespace Magma
 {
@@ -10,11 +11,20 @@ namespace Magma
 		: Framebuffer(spec), m_Device(DynamicCast<VulkanDevice>(device)->GetLogicalDevice()),
 		m_RenderPass(DynamicCast<VulkanRenderPass>(renderPass)->GetHandle()), m_Extent{ spec.Width, spec.Height }
 	{
+		std::vector<VkImageView> imageViews;
+		imageViews.reserve(m_Specification.TextureSpecs.size());
+
+		for (const auto& rt : m_Specification.RenderTargets)
+		{
+			auto vulkanTexture = DynamicCast<VulkanFramebufferTexture2D>(rt);
+			imageViews.push_back(vulkanTexture->GetVkImageView());
+		}
+
 		VkFramebufferCreateInfo framebufferInfo{};
 		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		framebufferInfo.renderPass = m_RenderPass;
 		framebufferInfo.attachmentCount = static_cast<u32>(m_Specification.TextureSpecs.size());
-		framebufferInfo.pAttachments = m_Specification.ImageViews.data();
+		framebufferInfo.pAttachments = imageViews.data();
 		framebufferInfo.width = m_Extent.width;
 		framebufferInfo.height = m_Extent.height;
 		framebufferInfo.layers = 1;

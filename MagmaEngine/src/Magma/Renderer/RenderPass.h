@@ -2,6 +2,7 @@
 
 #include "Magma/Core/Base.h"
 #include "Magma/Renderer/RenderDevice.h"
+#include "Magma/Renderer/Framebuffer.h"
 
 #include <glm/glm.hpp>
 
@@ -11,6 +12,7 @@ namespace Magma
 	{
 		None,
 		RGBA8,
+		D24S8
 	};
 
 	enum class ClearFlags
@@ -47,9 +49,13 @@ namespace Magma
 
 		inline const RenderPassSpecification& GetSpecification() const { return m_Specification; }
 
+		inline const Ref<Framebuffer>& GetFramebuffer() const { return m_Framebuffer; }
+		inline void SetFramebuffer(const Ref<Framebuffer>& framebuffer) { m_Framebuffer = framebuffer; }
+
 	protected:
 		explicit RenderPass(const RenderPassSpecification& spec) : m_Specification(spec) {}
 		RenderPassSpecification m_Specification;
+		Ref<Framebuffer> m_Framebuffer = nullptr;
 	};
 }
 

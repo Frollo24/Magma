@@ -51,5 +51,19 @@ namespace Magma
 	protected:
 		u32 m_MipLevels = 1;
 	};
+
+	enum class FramebufferTextureFormat;
+
+	class MAGMA_API FramebufferTexture2D : public Texture
+	{
+	public:
+		static Ref<FramebufferTexture2D> Create(const Ref<RenderDevice>& device, FramebufferTextureFormat format, const u32 width, const u32 height, const u32 numSamples = 1);
+
+		virtual void SetData(const void* data, u32 size) override {};
+		virtual void GenerateMipmaps() override {};
+
+	protected:
+		u32 m_NumSamples = 1;
+	};
 }
 

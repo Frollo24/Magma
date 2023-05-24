@@ -224,17 +224,20 @@ namespace Magma
 		renderPassInfo.renderPass = pass->GetHandle();
 
 		const bool& isSwapchainTarget = renderPass->GetSpecification().IsSwapchainTarget;
+		const Ref<VulkanFramebuffer>& framebuffer = DynamicCast<VulkanFramebuffer>(pass->GetFramebuffer());
 		renderPassInfo.framebuffer = isSwapchainTarget ?
 			swapchain->GetFramebuffer(imageIndex)->GetHandle() :
-			pass->GetFramebuffer()->GetHandle();
+			framebuffer->GetHandle();
 
 		renderPassInfo.renderArea.offset = { 0, 0 };
 		renderPassInfo.renderArea.extent = isSwapchainTarget ?
 			swapchain->GetExtent() :
-			pass->GetFramebuffer()->GetExtent();
+			framebuffer->GetExtent();
 
 		const ClearValues& clearValues = renderPass->GetSpecification().ClearValues;
 		const auto& color = clearValues.Color;
+		const auto& depth = clearValues.Depth;
+		const auto& stencil = clearValues.Stencil;
 
 		std::vector<VkClearValue> clearValue(renderPass->GetSpecification().Attachments.size());
 		for (size_t i = 0; i < clearValue.size(); i++)
@@ -244,6 +247,8 @@ namespace Magma
 				case AttachmentFormat::RGBA8:
 					clearValue[i].color = { color.r, color.g, color.b, color.a };
 					break;
+				case AttachmentFormat::D24S8:
+					clearValue[i].depthStencil = { depth, stencil };
 				default:
 					break;
 			}

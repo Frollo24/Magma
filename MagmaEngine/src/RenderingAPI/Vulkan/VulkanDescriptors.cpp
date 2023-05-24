@@ -150,6 +150,30 @@ namespace Magma
 		}
 	}
 
+	void VulkanDescriptorSet::WriteFramebufferTexture2D(const Ref<FramebufferTexture2D>& renderTarget)
+	{
+		Ref<VulkanFramebufferTexture2D> vulkanRenderTarget = DynamicCast<VulkanFramebufferTexture2D>(renderTarget);
+
+		for (const auto& descriptorSet : m_DescriptorSets)
+		{
+			VkDescriptorImageInfo imageInfo{};
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			imageInfo.imageView = vulkanRenderTarget->GetVkImageView();
+			imageInfo.sampler = vulkanRenderTarget->GetVkSampler();
+
+			VkWriteDescriptorSet descriptorWrite{};
+			descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrite.dstSet = descriptorSet;
+			descriptorWrite.dstBinding = vulkanRenderTarget->GetBinding();
+			descriptorWrite.dstArrayElement = 0;
+			descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrite.descriptorCount = 1;
+			descriptorWrite.pImageInfo = &imageInfo;
+
+			vkUpdateDescriptorSets(m_Device, 1, &descriptorWrite, 0, nullptr);
+		}
+	}
+
 	void VulkanDescriptorSet::InitDescriptorSets()
 	{
 		u32 maxFrames = m_Pool->GetMaxFrames();

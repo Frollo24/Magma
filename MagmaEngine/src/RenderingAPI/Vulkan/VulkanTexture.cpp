@@ -218,4 +218,127 @@ namespace Magma
 
 		EndSingleTimeCommands(commandPool, m_Device, mipmapCommand, m_VulkanDevice->GetQueueHandles().GraphicsQueue);
 	}
+
+	static VkFormat FramebufferTextureFormatToVkFormat(const FramebufferTextureFormat& format)
+	{
+		switch (format)
+		{
+			case FramebufferTextureFormat::RGBA8: return VK_FORMAT_R8G8B8A8_SRGB;
+			case FramebufferTextureFormat::Color: return VK_FORMAT_R8G8B8A8_SRGB;
+			case FramebufferTextureFormat::RGBA16F: return VK_FORMAT_R16G16B16A16_SFLOAT;
+			case FramebufferTextureFormat::Depth: return VK_FORMAT_D24_UNORM_S8_UINT;
+			default: return VK_FORMAT_UNDEFINED;
+		}
+	}
+
+	static VkImageUsageFlags FramebufferTextureFormatToVkAttachmentFlag(const FramebufferTextureFormat& format)
+	{
+		switch (format)
+		{
+			case FramebufferTextureFormat::RGBA8: return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+			case FramebufferTextureFormat::Color: return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+			case FramebufferTextureFormat::RGBA16F: return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+			case FramebufferTextureFormat::Depth: return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+			default: return VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM;
+		}
+	}
+
+	static VkImageLayout FramebufferTextureFormatToVkImageLayout(const FramebufferTextureFormat& format)
+	{
+		switch (format)
+		{
+			case FramebufferTextureFormat::RGBA8: return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			case FramebufferTextureFormat::Color: return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			case FramebufferTextureFormat::RGBA16F: return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			case FramebufferTextureFormat::Depth: return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			default: return VK_IMAGE_LAYOUT_MAX_ENUM;
+		}
+	}
+
+	VulkanFramebufferTexture2D::VulkanFramebufferTexture2D(const Ref<RenderDevice>& device, FramebufferTextureFormat format, const u32 width, const u32 height, const u32 numSamples)
+		: m_VulkanDevice(DynamicCast<VulkanDevice>(device))
+	{
+		m_PhysicalDevice = m_VulkanDevice->GetPhysicalDevice();
+		m_Device = m_VulkanDevice->GetLogicalDevice();
+		m_Dimensions = { width, height, 1 };
+
+		VkFormat vkformat = FramebufferTextureFormatToVkFormat(format);
+		VkImageUsageFlags attachment = FramebufferTextureFormatToVkAttachmentFlag(format);
+		VkImageAspectFlags aspect = FramebufferTextureFormatToVkImageAspect(format);
+
+		VulkanImageProperties imageProperties{};
+		imageProperties.extent = { width, height, 1 };
+		imageProperties.type = VK_IMAGE_TYPE_2D;
+		imageProperties.numSamples = (VkSampleCountFlagBits)numSamples;
+		imageProperties.format = vkformat;
+		imageProperties.tiling = VK_IMAGE_TILING_OPTIMAL;
+		imageProperties.mipLevels = 1;
+
+		VkImageUsageFlags imageUsage = attachment | VK_IMAGE_USAGE_SAMPLED_BIT;
+		CreateImage(m_PhysicalDevice, m_Device, imageProperties, imageUsage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_Image, m_ImageMemory);
+
+		VulkanContext* vulkanContext = dynamic_cast<VulkanContext*>(RenderContext::Instance().get());
+		VkCommandPool commandPool = vulkanContext->GetCommandPool();
+
+		VkCommandBuffer imageCreationCommand = BeginSingleTimeCommands(commandPool, m_Device);
+		TransitionImageLayout(imageCreationCommand, m_Image, format,
+			VK_IMAGE_LAYOUT_UNDEFINED, FramebufferTextureFormatToVkImageLayout(format));
+		EndSingleTimeCommands(commandPool, m_Device, imageCreationCommand, m_VulkanDevice->GetQueueHandles().GraphicsQueue);
+
+		VkImageViewCreateInfo viewInfo{};
+		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		viewInfo.image = m_Image;
+		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		viewInfo.format = vkformat;
+		viewInfo.subresourceRange.aspectMask = aspect;
+		viewInfo.subresourceRange.baseMipLevel = 0;
+		viewInfo.subresourceRange.levelCount = 1;
+		viewInfo.subresourceRange.baseArrayLayer = 0;
+		viewInfo.subresourceRange.layerCount = 1;
+
+		VkResult result = vkCreateImageView(m_Device, &viewInfo, nullptr, &m_ImageView);
+		MGM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create framebuffer texture imageview!");
+
+		VkSamplerCreateInfo samplerInfo{};
+		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+		samplerInfo.magFilter = VK_FILTER_LINEAR;
+		samplerInfo.minFilter = VK_FILTER_LINEAR;
+		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+
+		samplerInfo.unnormalizedCoordinates = VK_FALSE;
+		samplerInfo.compareEnable = VK_FALSE;
+		samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		samplerInfo.mipLodBias = 0.0f;
+		samplerInfo.minLod = 0.0f;
+		samplerInfo.maxLod = 0.0f;
+
+		VkPhysicalDeviceProperties properties{};
+		vkGetPhysicalDeviceProperties(m_PhysicalDevice, &properties);
+
+		samplerInfo.anisotropyEnable = VK_TRUE;
+		samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+
+		result = vkCreateSampler(m_Device, &samplerInfo, nullptr, &m_Sampler);
+		MGM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create framebuffer texture sampler!");
+	}
+
+	VulkanFramebufferTexture2D::~VulkanFramebufferTexture2D()
+	{
+		if (m_VulkanDevice == nullptr) return; // Is a thin wrapper to a swapchain image view, don't destroy anything
+
+		vkDestroySampler(m_Device, m_Sampler, nullptr);
+		vkDestroyImageView(m_Device, m_ImageView, nullptr);
+		vkDestroyImage(m_Device, m_Image, nullptr);
+		vkFreeMemory(m_Device, m_ImageMemory, nullptr);
+	}
+
+	Ref<VulkanFramebufferTexture2D> VulkanFramebufferTexture2D::CreateFromImageView(const VkImageView& imageView)
+	{
+		return CreateRef<VulkanFramebufferTexture2D>(imageView);
+	}
 }

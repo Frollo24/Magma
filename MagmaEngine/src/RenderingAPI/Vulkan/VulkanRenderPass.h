@@ -14,14 +14,9 @@ namespace Magma
 
 		inline VkRenderPass GetHandle() const { return m_RenderPass; }
 
-		inline const Ref<VulkanFramebuffer>& GetFramebuffer() { return m_Framebuffer; }
-		inline void SetFramebuffer(const Ref<VulkanFramebuffer>& framebuffer) { m_Framebuffer = framebuffer; }
-
 	private:
 		VkDevice m_Device = VK_NULL_HANDLE;
 		VkRenderPass m_RenderPass = VK_NULL_HANDLE;
-
-		Ref<VulkanFramebuffer> m_Framebuffer = nullptr;
 	};
 }
 

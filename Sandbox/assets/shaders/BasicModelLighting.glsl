@@ -65,7 +65,5 @@ void main() {
 	vec3 specular = lights.dirLight.color.rgb * spec * fragColor;
 
 	vec3 color = ambient + (diffuse + specular) * lights.dirLight.intensity;
-	color = ambient + diffuse + specular;
-
 	o_Color = vec4(color, 1.0);
 }

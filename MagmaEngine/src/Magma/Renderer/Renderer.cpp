@@ -8,6 +8,7 @@
 namespace Magma
 {
 	bool Renderer::s_BegunFrame = false;
+	std::vector<Ref<RenderSubsystem>> Renderer::s_RenderSubsystems{};
 
 	struct RendererData
 	{
@@ -62,6 +63,24 @@ namespace Magma
 		RenderCommand::BeginFrame();
 	}
 
+	void Renderer::RenderGameObjects()
+	{
+		for (const auto& system : s_RenderSubsystems)
+		{
+			const auto& renderPass = system->GetPipeline()->GetRenderPass();
+			const bool& isSwapchainTarget = renderPass->GetSpecification().IsSwapchainTarget;
+			u32 width = isSwapchainTarget ? s_RendererData->RenderSwapchain->GetWidth() : renderPass->GetFramebuffer()->GetSpecification().Width;
+			u32 height = isSwapchainTarget ? s_RendererData->RenderSwapchain->GetHeight() : renderPass->GetFramebuffer()->GetSpecification().Height;
+
+			RenderCommand::BeginRenderPass(renderPass);
+			RenderCommand::SetViewport(0, 0, width, height);
+			RenderCommand::SetScissor(0, 0, width, height);
+			system->Bind();
+			system->RenderGameObjects();
+			RenderCommand::EndRenderPass(renderPass);
+		}
+	}
+
 	void Renderer::DrawToScreen()
 	{
 		auto drawToScreenPass = s_RendererData->RenderSwapchain->GetMainRenderPass();
@@ -83,8 +102,23 @@ namespace Magma
 
 	void Renderer::Shutdown()
 	{
+		for (auto& subsystem : s_RenderSubsystems)
+			subsystem = nullptr;
+
 		delete s_RendererData;
 		RenderCommand::Shutdown();
+	}
+
+	void Renderer::AddGameObject(const Ref<GameObject>& gameObject)
+	{
+		bool wasAdded = false;
+
+		for (const auto& subsystem : Renderer::GetRenderSubsystems())
+			if (subsystem->TryAddGameObject(gameObject))
+				wasAdded = true;
+
+		if (!wasAdded)
+			MGM_CORE_WARN("A gameObject could not be added to the renderer!");
 	}
 
 	void Renderer::SetScreenTexture(const Ref<FramebufferTexture2D>& screenTexture)

@@ -6,49 +6,61 @@
 static Magma::Ref<Magma::Shader> s_Shader = nullptr;
 static Magma::Ref<Magma::Pipeline> s_Pipeline = nullptr;
 static Magma::Ref<Magma::Model> s_Model = nullptr;
-static glm::mat4 s_ViewProj;
 
 static Magma::Ref<Magma::DescriptorSetLayout> s_DescriptorLayout = nullptr;
 static Magma::Ref<Magma::DescriptorPool> s_DescriptorPool = nullptr;
 static Magma::Ref<Magma::DescriptorSet> s_DescriptorSet = nullptr;
-static Magma::Ref<Magma::UniformBuffer> s_UniformBuffer = nullptr;
-static Magma::Ref<Magma::Texture2D> s_Texture = nullptr;
+static Magma::Ref<Magma::UniformBuffer> s_CameraUBO = nullptr;
+static Magma::Ref<Magma::UniformBuffer> s_LightUBO = nullptr;
 
 static Magma::Ref<Magma::RenderPass> s_RenderPass = nullptr;
 static Magma::Ref<Magma::Framebuffer> s_Framebuffer = nullptr;
 static Magma::Ref<Magma::FramebufferTexture2D> s_FramebufferTextureColor = nullptr;
 static Magma::Ref<Magma::FramebufferTexture2D> s_FramebufferTextureDepth = nullptr;
 
-struct TestConstantData
+struct CameraUBO
 {
-	// glm::mat4 viewProj;
-	glm::vec4 tintColor;
-	glm::vec3 posOffset;
+	glm::mat4 viewProj;
+	glm::mat4 proj;
+	glm::mat4 view;
 };
+static CameraUBO s_CameraData{};
+
+struct DirLight
+{
+	glm::vec4 color;
+	glm::vec3 direction;
+	float intensity;
+};
+static DirLight s_DirLightData{};
 
 SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 {
 	const auto& instance = Magma::Application::Instance().GetWindow().GetGraphicsInstance();
 	const auto& device = instance->GetDevice();
 
-	Magma::DescriptorBinding matrixTransform{ Magma::DescriptorType::UniformBuffer, 0 };
-	Magma::DescriptorBinding texture2D{ Magma::DescriptorType::ImageSampler, 1 };
+	Magma::DescriptorBinding viewProj{ Magma::DescriptorType::UniformBuffer, 0 };
+	Magma::DescriptorBinding dirLight{ Magma::DescriptorType::UniformBuffer, 1 };
 	Magma::DescriptorSetLayoutSpecification layoutSpec{};
-	layoutSpec.Bindings = { matrixTransform, texture2D };
+	layoutSpec.Bindings = { viewProj, dirLight };
 	s_DescriptorLayout = Magma::DescriptorSetLayout::Create(layoutSpec, device);
 	s_DescriptorPool = Magma::DescriptorPool::Create(device);
 	s_DescriptorSet = Magma::DescriptorSet::Create(device, s_DescriptorLayout, s_DescriptorPool);
 
-	s_UniformBuffer = Magma::UniformBuffer::Create(device, sizeof(glm::mat4), 0, 2);
-	s_DescriptorSet->WriteUniformBuffer(s_UniformBuffer, sizeof(glm::mat4));
+	s_CameraUBO = Magma::UniformBuffer::Create(device, sizeof(CameraUBO), 0, 2);
+	s_LightUBO = Magma::UniformBuffer::Create(device, sizeof(DirLight), 1, 2);
+	s_DescriptorSet->WriteUniformBuffer(s_CameraUBO, sizeof(CameraUBO));
+	s_DescriptorSet->WriteUniformBuffer(s_LightUBO, sizeof(DirLight));
 
-	bool generateMipmapsOnLoad = false;
-	s_Texture = Magma::Texture2D::Create(device, "assets/textures/texture-wood.jpg", generateMipmapsOnLoad);
-	s_Texture->GenerateMipmaps();
-	s_Texture->SetBinding(1);
-	s_DescriptorSet->WriteTexture2D(s_Texture);
+	s_CameraData.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	s_CameraData.proj = glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.1f, 25.0f);
+	s_CameraData.viewProj = s_CameraData.proj * s_CameraData.view;
 
-	s_Shader = Magma::Shader::Create("assets/shaders/VulkanTestDescriptors.glsl");
+	s_DirLightData.color = { 1.0f, 0.99f, 0.96f, 1.0f };
+	s_DirLightData.direction = { -1.0f, -1.0f, -1.0f };
+	s_DirLightData.intensity = 1.0f;
+
+	s_Shader = Magma::Shader::Create("assets/shaders/BasicModelLighting.glsl");
 	Magma::PipelineSpecification pipelineSpec{};
 	pipelineSpec.InputElementsLayout = {
 		{Magma::ShaderDataType::Float3, "a_Position"},
@@ -58,7 +70,7 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 		{Magma::ShaderDataType::Float3, "a_Bitangent"},
 	};
 	pipelineSpec.GlobalDataLayout.DescriptorLayouts.push_back(s_DescriptorLayout);
-	pipelineSpec.GlobalDataLayout.ConstantDataSize = sizeof(TestConstantData);
+	pipelineSpec.GlobalDataLayout.ConstantDataSize = sizeof(Magma::SimpleConstantData);
 	pipelineSpec.Shader = s_Shader;
 
 	Magma::RenderPassSpecification renderPassSpec{};
@@ -70,11 +82,8 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	s_RenderPass = Magma::RenderPass::Create(renderPassSpec, device);
 	s_Pipeline = Magma::Pipeline::Create(pipelineSpec, device, s_RenderPass);
 
-	s_Model = Magma::CreateRef<Magma::Model>("assets/models/UVSphere.obj", device);
-
-	s_ViewProj = glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.1f, 25.0f)
-		* glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	s_UniformBuffer->SetCommonDataForAllFrames(&s_ViewProj, sizeof(glm::mat4));
+	s_CameraUBO->SetCommonDataForAllFrames(&s_CameraData, sizeof(CameraUBO));
+	s_LightUBO->SetCommonDataForAllFrames(&s_DirLightData, sizeof(DirLight));
 
 	Magma::u32 width = instance->GetSwapchain()->GetWidth();
 	Magma::u32 height = instance->GetSwapchain()->GetHeight();
@@ -89,7 +98,16 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	s_Framebuffer = Magma::Framebuffer::Create(framebufferSpec, device, s_RenderPass);
 	s_RenderPass->SetFramebuffer(s_Framebuffer);
 
+	const auto& simpleRenderSubsystem = Magma::CreateRef<Magma::SimpleRenderSubsystem>(s_Pipeline);
+	simpleRenderSubsystem->SetDescriptorChunk({s_DescriptorSet});
+	Magma::Renderer::AddRenderSubsystem(simpleRenderSubsystem);
 	Magma::Renderer::SetScreenTexture(s_FramebufferTextureColor);
+
+	const auto& gameObject = Magma::CreateRef<Magma::GameObject>();
+	const auto& meshRenderer = Magma::CreateRef<Magma::MeshRenderer>(Magma::CreateRef<Magma::Model>("assets/models/UVSphere.obj", device));
+	meshRenderer->SetMaterial(Magma::CreateRef<Magma::Material>());
+	gameObject->SetMeshRenderer(meshRenderer);
+	Magma::Renderer::AddGameObject(gameObject);
 }
 
 SandboxLayer::~SandboxLayer()
@@ -99,8 +117,8 @@ SandboxLayer::~SandboxLayer()
 	s_Framebuffer = nullptr;
 	s_RenderPass = nullptr;
 
-	s_Texture = nullptr;
-	s_UniformBuffer = nullptr;
+	s_LightUBO = nullptr;
+	s_CameraUBO = nullptr;
 	s_DescriptorSet = nullptr;
 	s_DescriptorPool = nullptr;
 	s_DescriptorLayout = nullptr;
@@ -112,42 +130,7 @@ SandboxLayer::~SandboxLayer()
 
 void SandboxLayer::OnUpdate()
 {
-	// TEMPORARY
-	const auto& window = Magma::Application::Instance().GetWindow();
-
-	TestConstantData data{};
-	// data.viewProj = s_ViewProj;
-
-	auto& lookAt = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	auto& rotate = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f * (float)Magma::Time::TotalTime), glm::vec3(1.0f, 0.0f, 0.0f));
-	s_ViewProj = glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.1f, 25.0f) * rotate * lookAt;
-	s_UniformBuffer->SetData(&s_ViewProj, sizeof(glm::mat4));
-
-	Magma::RenderCommand::BeginRenderPass(s_RenderPass);
-	Magma::RenderCommand::SetViewport(0, 0, window.GetWidth(), window.GetHeight());
-	Magma::RenderCommand::SetScissor(0, 0, window.GetWidth(), window.GetHeight());
-	Magma::RenderCommand::BindPipeline(s_Pipeline);
-	Magma::RenderCommand::BindDescriptorSet(s_DescriptorSet, s_Pipeline, 0);
-	{
-		data.tintColor = glm::vec4(0.5f, 0.3f, 0.2f, 1.0f);
-		data.posOffset = glm::vec4(0.5f);
-		Magma::RenderCommand::UploadConstantData(s_Pipeline, sizeof(TestConstantData), &data);
-		s_Model->Render();
-	}
-	{
-		data.tintColor = glm::vec4(1.0f);
-		data.posOffset = glm::vec4(-0.5f);
-		Magma::RenderCommand::UploadConstantData(s_Pipeline, sizeof(TestConstantData), &data);
-		s_Model->Render();
-	}
-	{
-		data.tintColor = glm::vec4(0.4f, 1.0f, 0.3f, 1.0f);
-		data.posOffset = glm::vec4(1.5f);
-		Magma::RenderCommand::UploadConstantData(s_Pipeline, sizeof(TestConstantData), &data);
-		s_Model->Render();
-	}
-	
-	Magma::RenderCommand::EndRenderPass(s_RenderPass);
+	Magma::Renderer::RenderGameObjects();
 	Magma::Renderer::DrawToScreen();
 }
 

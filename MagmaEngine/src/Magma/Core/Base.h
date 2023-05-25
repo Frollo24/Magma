@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning (disable: 4251) // NOTE: This should be managed by build system or a better memory system
 
 #include "Magma/Core/Defines.h"
 #include "Magma/Core/Includes.h"

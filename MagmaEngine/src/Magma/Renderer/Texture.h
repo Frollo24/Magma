@@ -24,7 +24,7 @@ namespace Magma
 		};
 	};
 
-	class Texture
+	class MAGMA_API Texture
 	{
 	public:
 		virtual ~Texture() = default;

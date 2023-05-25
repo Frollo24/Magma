@@ -1,15 +1,15 @@
 #pragma once
 #include "Magma/Renderer/RenderSubsystem.h"
 
-#include "SimpleConstantData.h"
+#include "DepthPrepassConstantData.h"
 
 namespace Magma
 {
-	class SimpleRenderSubsystem : public RenderSubsystem
+	class DepthPrepassRenderSubsystem : public RenderSubsystem
 	{
 	public:
-		SimpleRenderSubsystem(const Ref<Pipeline>& pipeline);
-		virtual ~SimpleRenderSubsystem();
+		DepthPrepassRenderSubsystem(const Ref<Pipeline>& pipeline);
+		virtual ~DepthPrepassRenderSubsystem();
 
 		virtual bool IsGameObjectSuitable(const Ref<GameObject>& gameObject) override;
 		virtual void RenderGameObjects() override;

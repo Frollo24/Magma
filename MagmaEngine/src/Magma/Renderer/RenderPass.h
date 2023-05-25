@@ -12,7 +12,8 @@ namespace Magma
 	{
 		None,
 		RGBA8,
-		D24S8
+		D24S8,
+		D32
 	};
 
 	enum class ClearFlags

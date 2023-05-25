@@ -10,6 +10,7 @@
 
 // Elements
 #include "Magma/Elements/GameObject.h"
+#include "Magma/Elements/Camera.h"
 
 // Renderer
 #include "Magma/Renderer/Renderer.h"

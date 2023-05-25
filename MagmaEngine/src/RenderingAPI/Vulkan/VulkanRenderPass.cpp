@@ -11,6 +11,7 @@ namespace Magma
 		{
 			case AttachmentFormat::RGBA8: return VK_FORMAT_R8G8B8A8_SRGB;
 			case AttachmentFormat::D24S8: return VK_FORMAT_D24_UNORM_S8_UINT;
+			case AttachmentFormat::D32:   return VK_FORMAT_D32_SFLOAT;
 			default: return VK_FORMAT_UNDEFINED;
 		}
 	}
@@ -87,6 +88,7 @@ namespace Magma
 					colorAttachmentsRefs.push_back(attachmentRef);
 					break;
 				case AttachmentFormat::D24S8:
+				case AttachmentFormat::D32:
 					if (hasDepthAttachment)
 						break;
 					hasDepthAttachment = true;

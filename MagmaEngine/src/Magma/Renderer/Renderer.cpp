@@ -1,13 +1,17 @@
 #include "mgmpch.h"
 #include "Renderer.h"
 #include "RenderCommand.h"
+#include "SubsystemManager.h"
 
 #include "Magma/Core/Application.h"
 #include "Magma/Renderer/RenderSwapchain.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace Magma
 {
 	bool Renderer::s_BegunFrame = false;
+	Ref<Camera> Renderer::s_Camera = nullptr;
 	std::vector<Ref<RenderSubsystem>> Renderer::s_RenderSubsystems{};
 
 	struct RendererData
@@ -25,6 +29,10 @@ namespace Magma
 
 	void Renderer::Init()
 	{
+		Camera::Main = CreateRef<Camera>(glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.3f, 10.0f));
+		Camera::Main->SetView(glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+		s_Camera = Camera::Main;
+
 		s_RendererData = new RendererData();
 		s_RendererData->RenderDevice = Application::Instance().GetWindow().GetGraphicsInstance()->GetDevice();
 		s_RendererData->RenderSwapchain = Application::Instance().GetWindow().GetGraphicsInstance()->GetSwapchain();
@@ -32,7 +40,7 @@ namespace Magma
 
 		// TEMPORARY
 		RenderPassSpecification swapchainSpec;
-		swapchainSpec.ClearValues.ClearFlags |= ClearFlags::Color;
+		swapchainSpec.ClearValues.ClearFlags = ClearFlags::Color;
 		swapchainSpec.ClearValues.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
 		swapchainSpec.Attachments = { AttachmentFormat::RGBA8 };
 		swapchainSpec.IsSwapchainTarget = true;
@@ -40,19 +48,20 @@ namespace Magma
 		auto renderPass = RenderPass::Create(swapchainSpec, s_RendererData->RenderDevice);
 		s_RendererData->RenderSwapchain->CreateFramebuffers(s_RendererData->RenderDevice, renderPass);
 
-		Magma::DescriptorBinding screenTexture{ Magma::DescriptorType::ImageSampler, 0 };
-		Magma::DescriptorSetLayoutSpecification layoutSpec{};
+		DescriptorBinding screenTexture{ DescriptorType::ImageSampler, 0 };
+		DescriptorSetLayoutSpecification layoutSpec{};
 		layoutSpec.Bindings = { screenTexture };
-		s_RendererData->DescriptorPool = Magma::DescriptorPool::Create(s_RendererData->RenderDevice);
-		s_RendererData->ScreenDescriptorLayout = Magma::DescriptorSetLayout::Create(layoutSpec, s_RendererData->RenderDevice);
-		s_RendererData->ScreenDescriptorSet = Magma::DescriptorSet::Create(s_RendererData->RenderDevice, s_RendererData->ScreenDescriptorLayout, s_RendererData->DescriptorPool);
+		s_RendererData->DescriptorPool = DescriptorPool::Create(s_RendererData->RenderDevice);
+		s_RendererData->ScreenDescriptorLayout = DescriptorSetLayout::Create(layoutSpec, s_RendererData->RenderDevice);
+		s_RendererData->ScreenDescriptorSet = DescriptorSet::Create(s_RendererData->RenderDevice, s_RendererData->ScreenDescriptorLayout, s_RendererData->DescriptorPool);
 
-		s_RendererData->ScreenShader = Magma::Shader::Create("assets/shaders/DrawToScreen.glsl");
-		Magma::PipelineSpecification spec{};
+		s_RendererData->ScreenShader = Shader::Create("assets/shaders/DrawToScreen.glsl");
+		PipelineSpecification spec{};
 		spec.GlobalDataLayout.DescriptorLayouts.push_back(s_RendererData->ScreenDescriptorLayout);
 		spec.Shader = s_RendererData->ScreenShader;
+		s_RendererData->ScreenPipeline = Pipeline::Create(spec, s_RendererData->RenderDevice, renderPass);
 
-		s_RendererData->ScreenPipeline = Magma::Pipeline::Create(spec, s_RendererData->RenderDevice, renderPass);
+		SubsystemManager::InitSubsystems();
 	}
 
 	void Renderer::BeginFrame()
@@ -102,11 +111,13 @@ namespace Magma
 
 	void Renderer::Shutdown()
 	{
-		for (auto& subsystem : s_RenderSubsystems)
-			subsystem = nullptr;
-
 		delete s_RendererData;
 		RenderCommand::Shutdown();
+
+		SubsystemManager::Shutdown();
+
+		for (auto& subsystem : s_RenderSubsystems)
+			subsystem = nullptr;
 	}
 
 	void Renderer::AddGameObject(const Ref<GameObject>& gameObject)
@@ -124,5 +135,10 @@ namespace Magma
 	void Renderer::SetScreenTexture(const Ref<FramebufferTexture2D>& screenTexture)
 	{
 		s_RendererData->ScreenDescriptorSet->WriteFramebufferTexture2D(screenTexture);
+	}
+
+	const Ref<DescriptorPool>& Renderer::GetDescriptorPool()
+	{
+		return s_RendererData->DescriptorPool;
 	}
 }

@@ -12,7 +12,8 @@ namespace Magma
 		RGBA8,
 		Color,
 		RGBA16F,
-		Depth
+		Depth,
+		DepthStencil
 	};
 
 	struct FramebufferTextureSpecification

@@ -248,6 +248,7 @@ namespace Magma
 					clearValue[i].color = { color.r, color.g, color.b, color.a };
 					break;
 				case AttachmentFormat::D24S8:
+				case AttachmentFormat::D32:
 					clearValue[i].depthStencil = { depth, stencil };
 				default:
 					break;

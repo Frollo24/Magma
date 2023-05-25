@@ -223,10 +223,11 @@ namespace Magma
 	{
 		switch (format)
 		{
-			case FramebufferTextureFormat::RGBA8: return VK_FORMAT_R8G8B8A8_SRGB;
-			case FramebufferTextureFormat::Color: return VK_FORMAT_R8G8B8A8_SRGB;
-			case FramebufferTextureFormat::RGBA16F: return VK_FORMAT_R16G16B16A16_SFLOAT;
-			case FramebufferTextureFormat::Depth: return VK_FORMAT_D24_UNORM_S8_UINT;
+			case FramebufferTextureFormat::RGBA8:        return VK_FORMAT_R8G8B8A8_SRGB;
+			case FramebufferTextureFormat::Color:        return VK_FORMAT_R8G8B8A8_SRGB;
+			case FramebufferTextureFormat::RGBA16F:      return VK_FORMAT_R16G16B16A16_SFLOAT;
+			case FramebufferTextureFormat::Depth:        return VK_FORMAT_D32_SFLOAT;
+			case FramebufferTextureFormat::DepthStencil: return VK_FORMAT_D24_UNORM_S8_UINT;
 			default: return VK_FORMAT_UNDEFINED;
 		}
 	}
@@ -235,10 +236,11 @@ namespace Magma
 	{
 		switch (format)
 		{
-			case FramebufferTextureFormat::RGBA8: return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-			case FramebufferTextureFormat::Color: return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-			case FramebufferTextureFormat::RGBA16F: return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-			case FramebufferTextureFormat::Depth: return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+			case FramebufferTextureFormat::RGBA8:        return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+			case FramebufferTextureFormat::Color:        return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+			case FramebufferTextureFormat::RGBA16F:      return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+			case FramebufferTextureFormat::Depth:        return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+			case FramebufferTextureFormat::DepthStencil: return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 			default: return VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM;
 		}
 	}
@@ -247,10 +249,11 @@ namespace Magma
 	{
 		switch (format)
 		{
-			case FramebufferTextureFormat::RGBA8: return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			case FramebufferTextureFormat::Color: return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			case FramebufferTextureFormat::RGBA16F: return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			case FramebufferTextureFormat::Depth: return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			case FramebufferTextureFormat::RGBA8:        return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			case FramebufferTextureFormat::Color:        return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			case FramebufferTextureFormat::RGBA16F:      return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			case FramebufferTextureFormat::Depth:        return VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+			case FramebufferTextureFormat::DepthStencil: return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			default: return VK_IMAGE_LAYOUT_MAX_ENUM;
 		}
 	}

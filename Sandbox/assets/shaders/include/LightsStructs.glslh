@@ -1,0 +1,32 @@
+struct DirLight {
+    vec4 color;
+
+    vec3 direction;
+    float intensity;
+};
+#define NR_DIR_LIGHTS 4
+
+struct PointLight {    
+    vec4 color;
+
+    vec3 position;
+    float intensity;
+};
+#define NR_POINT_LIGHTS 16
+
+struct SpotLight {    
+    vec4 color;
+
+    vec3 position;
+    float intensity;
+
+    vec3 direction;
+    float angle;
+};
+#define NR_SPOT_LIGHTS 8
+
+layout(set = 0, binding = 3) uniform LightsUbo {
+	DirLight dirLight[NR_DIR_LIGHTS];
+	PointLight pointLight[NR_POINT_LIGHTS];
+	SpotLight spotLight[NR_SPOT_LIGHTS];
+} u_Lights;

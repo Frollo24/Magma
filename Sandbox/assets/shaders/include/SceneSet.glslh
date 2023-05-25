@@ -1,0 +1,16 @@
+layout(set = 0, binding = 0) uniform SceneUbo {
+	mat4 viewProj;
+	mat4 proj;
+	mat4 view;
+} u_Scene;
+
+layout(set = 0, binding = 1) uniform FogUbo {
+	vec4 fogColor; // w stands for fog density
+} u_Fog;
+
+layout(set = 0, binding = 2) uniform PhysicalCameraUbo {
+	float focalLength;
+	float focusingDistance;
+	float exposure;
+	float aperture;
+} u_PhysCamera;

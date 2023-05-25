@@ -23,6 +23,7 @@ namespace Magma
 		Ref<Pipeline> ScreenPipeline = nullptr;
 		Ref<DescriptorSetLayout> ScreenDescriptorLayout = nullptr;
 		Ref<DescriptorSet> ScreenDescriptorSet = nullptr;
+		Ref<DescriptorSetLayout> MaterialDescriptorLayout = nullptr;
 	};
 
 	static RendererData* s_RendererData = nullptr;
@@ -61,6 +62,18 @@ namespace Magma
 		spec.Shader = s_RendererData->ScreenShader;
 		s_RendererData->ScreenPipeline = Pipeline::Create(spec, s_RendererData->RenderDevice, renderPass);
 
+		// Material Layout
+		DescriptorBinding albedoTexture{ DescriptorType::ImageSampler, 0 };
+		DescriptorBinding normalTexture{ DescriptorType::ImageSampler, 1 };
+		DescriptorBinding metallicTexture{ DescriptorType::ImageSampler, 2 };
+		DescriptorBinding roughnessTexture{ DescriptorType::ImageSampler, 3 };
+		DescriptorBinding emmisiveTexture{ DescriptorType::ImageSampler, 4 };
+
+		DescriptorSetLayoutSpecification materialLayout;
+		materialLayout.Bindings = { albedoTexture, normalTexture, metallicTexture, roughnessTexture, emmisiveTexture };
+		s_RendererData->MaterialDescriptorLayout = DescriptorSetLayout::Create(materialLayout, s_RendererData->RenderDevice);
+
+		// Init subsystems
 		SubsystemManager::InitSubsystems();
 	}
 
@@ -140,5 +153,15 @@ namespace Magma
 	const Ref<DescriptorPool>& Renderer::GetDescriptorPool()
 	{
 		return s_RendererData->DescriptorPool;
+	}
+
+	const Ref<DescriptorSetLayout>& Renderer::GetMaterialDescriptorSetLayout()
+	{
+		return s_RendererData->MaterialDescriptorLayout;
+	}
+
+	const Ref<RenderDevice>& Renderer::GetDevice()
+	{
+		return s_RendererData->RenderDevice;
 	}
 }

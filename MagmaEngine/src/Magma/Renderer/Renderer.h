@@ -29,6 +29,8 @@ namespace Magma
 		static void AddGameObject(const Ref<GameObject>& gameObject);
 		static void SetScreenTexture(const Ref<FramebufferTexture2D>& screenTexture);
 		static const Ref<DescriptorPool>& GetDescriptorPool();
+		static const Ref<DescriptorSetLayout>& GetMaterialDescriptorSetLayout();
+		static const Ref<RenderDevice>& GetDevice();
 
 	private:
 		static bool s_BegunFrame;

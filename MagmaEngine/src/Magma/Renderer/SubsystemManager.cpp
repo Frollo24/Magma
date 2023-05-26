@@ -9,6 +9,7 @@
 #include "Subsystems/DepthPrepassRenderSubsystem.h"
 #include "Subsystems/SimpleRenderSubsystem.h"
 #include "Subsystems/DefaultRenderSubsystem.h"
+#include "Subsystems/SkyboxRenderSubsystem.h"
 #include "Subsystems/DrawToBufferRenderSubsystem.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -54,6 +55,7 @@ namespace Magma
 #else
 		InitDefaultForwardSubsystem();
 #endif
+		InitSkyboxSubsystem();
 	}
 
 	void SubsystemManager::Shutdown()
@@ -409,6 +411,64 @@ namespace Magma
 		defaultDeferredSubsystem->SetDescriptorChunk({ sceneSet, geomSet });
 		Renderer::AddRenderSubsystem(defaultDeferredSubsystem);
 		Renderer::SetScreenTexture(framebufferTextureColor);
+	}
+
+	void SubsystemManager::InitSkyboxSubsystem()
+	{
+		const auto& instance = Application::Instance().GetWindow().GetGraphicsInstance();
+		const auto& device = instance->GetDevice();
+
+		// Scene Layout
+		DescriptorBinding cameraTransforms{ DescriptorType::UniformBuffer, 0 };
+		DescriptorBinding fogSettings{ DescriptorType::UniformBuffer, 1 };
+		DescriptorBinding physicalCamera{ DescriptorType::UniformBuffer, 2 };
+		DescriptorBinding lights{ DescriptorType::UniformBuffer, 3 };
+		DescriptorBinding brdfLut{ DescriptorType::ImageSampler, 4 };
+		DescriptorBinding skybox{ DescriptorType::ImageSampler, 5 };
+		DescriptorSetLayoutSpecification sceneLayout{};
+		sceneLayout.Bindings = { cameraTransforms, fogSettings, physicalCamera, lights, brdfLut, skybox };
+
+		Ref<DescriptorSetLayout> descriptorLayout = DescriptorSetLayout::Create(sceneLayout, device);
+		Ref<DescriptorSet> descriptorSet = DescriptorSet::Create(device, descriptorLayout, Renderer::GetDescriptorPool());
+
+		descriptorSet->WriteUniformBuffer(s_CameraUniformBuffer, (u32)sizeof(GlobalUBO));
+		descriptorSet->WriteUniformBuffer(s_FogUniformBuffer, (u32)sizeof(FogUBO));
+		descriptorSet->WriteUniformBuffer(s_PhysicalCameraUniformBuffer, (u32)sizeof(PhysicalCameraUBO));
+		descriptorSet->WriteUniformBuffer(s_LightsUniformBuffer, (u32)sizeof(LightsUBO));
+		descriptorSet->WriteTexture2D(s_PreintegratedFG);
+		descriptorSet->WriteTextureCube(s_Skybox);
+
+		const auto& shader = Shader::Create("assets/shaders/Skybox.glsl");
+		PipelineSpecification pipelineSpec{};
+		pipelineSpec.InputElementsLayout = {
+			{ ShaderDataType::Float3, "a_SkyboxVertices" }
+		};
+		pipelineSpec.GlobalDataLayout.DescriptorLayouts.push_back(descriptorLayout);
+		pipelineSpec.PipelineDepthState.DepthWrite = false;
+		pipelineSpec.PipelineDepthState.DepthFunc = DepthComparison::LessOrEqual;
+		pipelineSpec.Shader = shader;
+
+		RenderPassSpecification renderPassSpec{};
+		renderPassSpec.Attachments = { AttachmentFormat::RGBA8, AttachmentFormat::D32 };
+		renderPassSpec.IsSwapchainTarget = false;
+
+		const auto& renderPass = RenderPass::Create(renderPassSpec, device);
+		const auto& pipeline = Pipeline::Create(pipelineSpec, device, renderPass);
+
+		u32 width = instance->GetSwapchain()->GetWidth();
+		u32 height = instance->GetSwapchain()->GetHeight();
+		FramebufferSpecification framebufferSpec{};
+		framebufferSpec.Width = width;
+		framebufferSpec.Height = height;
+		framebufferSpec.RenderTargets = { Renderer::GetScreenTexture(), s_DepthbufferTexture};
+		framebufferSpec.TextureSpecs = { { FramebufferTextureFormat::Color }, { FramebufferTextureFormat::Depth } };
+
+		const auto& framebuffer = Framebuffer::Create(framebufferSpec, device, renderPass);
+		renderPass->SetFramebuffer(framebuffer);
+
+		const auto& skyboxSubsystem = CreateRef<SkyboxRenderSubsystem>(pipeline);
+		skyboxSubsystem->SetDescriptorChunk({ descriptorSet });
+		Renderer::AddRenderSubsystem(skyboxSubsystem);
 	}
 
 	void SubsystemManager::InitUniformBuffers()

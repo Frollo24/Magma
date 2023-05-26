@@ -15,4 +15,3 @@ namespace Magma
 		virtual void RenderGameObjects() override;
 	};
 }
-

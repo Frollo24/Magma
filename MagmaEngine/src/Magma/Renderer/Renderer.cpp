@@ -23,6 +23,7 @@ namespace Magma
 		Ref<Pipeline> ScreenPipeline = nullptr;
 		Ref<DescriptorSetLayout> ScreenDescriptorLayout = nullptr;
 		Ref<DescriptorSet> ScreenDescriptorSet = nullptr;
+		Ref<FramebufferTexture2D> ScreenTexture = nullptr;
 		Ref<DescriptorSetLayout> MaterialDescriptorLayout = nullptr;
 	};
 
@@ -145,8 +146,14 @@ namespace Magma
 			MGM_CORE_WARN("A gameObject could not be added to the renderer!");
 	}
 
+	const Ref<FramebufferTexture2D>& Renderer::GetScreenTexture()
+	{
+		return s_RendererData->ScreenTexture;
+	}
+
 	void Renderer::SetScreenTexture(const Ref<FramebufferTexture2D>& screenTexture)
 	{
+		s_RendererData->ScreenTexture = screenTexture;
 		s_RendererData->ScreenDescriptorSet->WriteFramebufferTexture2D(screenTexture);
 	}
 

@@ -52,6 +52,15 @@ namespace Magma
 		u32 m_MipLevels = 1;
 	};
 
+	class MAGMA_API TextureCube : public Texture
+	{
+	public:
+		static Ref<TextureCube> Create(const Ref<RenderDevice>& device, const std::array<std::string, 6>& filepaths, const bool generateMipmapsOnLoad = true);
+
+	protected:
+		u32 m_MipLevels = 1;
+	};
+
 	enum class FramebufferTextureFormat;
 
 	class MAGMA_API FramebufferTexture2D : public Texture

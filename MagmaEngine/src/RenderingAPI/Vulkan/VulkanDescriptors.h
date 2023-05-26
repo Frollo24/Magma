@@ -45,6 +45,7 @@ namespace Magma
 
 		virtual void WriteUniformBuffer(const Ref<UniformBuffer>& uniformBuffer, u32 size) override;
 		virtual void WriteTexture2D(const Ref<Texture2D>& texture) override;
+		virtual void WriteTextureCube(const Ref<TextureCube>& cubemap) override;
 		virtual void WriteFramebufferTexture2D(const Ref<FramebufferTexture2D>& renderTarget) override;
 
 	private:

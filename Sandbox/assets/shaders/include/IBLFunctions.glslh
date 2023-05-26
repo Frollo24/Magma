@@ -1,0 +1,28 @@
+// ------------------------------ IBL --------------------------------------
+const float GAMMA = 2.2;
+
+// Radiance Preintegration LUT
+vec3 RadianceIBLIntegration(float NdotV, float roughness, vec3 specular)
+{
+	vec2 preintegratedFG = texture(t_PreintegratedFG, vec2(roughness, 1.0 - NdotV)).rg;
+	return specular * preintegratedFG.r + preintegratedFG.g;
+}
+
+// Image-based lighting
+vec3 IBL(Material material, vec3 N, vec3 V)
+{
+	float NdotV = max(dot(N, V), 0.0);
+
+	vec3 reflectionVector = normalize(reflect(-V, N));
+	float smoothness = 1.0 - material.roughness;
+	float mipLevel = (1.0 - smoothness * smoothness) * 10.0;
+	vec4 cs = textureLod(t_IrradianceMap, reflectionVector, mipLevel);
+	vec3 result = pow(cs.xyz, vec3(GAMMA)) * RadianceIBLIntegration(NdotV, 1.0 - smoothness, vec3(1.0));
+
+	vec3 diffuseDominantDirection = N;
+	float diffuseLowMip = 9.6;
+	vec3 diffuseImageLighting = textureLod(t_IrradianceMap, diffuseDominantDirection, diffuseLowMip).rgb;
+	diffuseImageLighting = pow(diffuseImageLighting, vec3(GAMMA));
+
+	return result + diffuseImageLighting * material.albedo.rgb;
+}

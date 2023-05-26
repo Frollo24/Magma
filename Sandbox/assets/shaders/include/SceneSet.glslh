@@ -14,3 +14,6 @@ layout(set = 0, binding = 2) uniform PhysicalCameraUbo {
 	float exposure;
 	float aperture;
 } u_PhysCamera;
+
+layout(set = 0, binding = 4) uniform sampler2D t_PreintegratedFG;
+layout(set = 0, binding = 5) uniform samplerCube t_IrradianceMap;

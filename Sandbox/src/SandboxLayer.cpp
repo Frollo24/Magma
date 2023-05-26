@@ -11,7 +11,7 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	const auto& redMaterial = Magma::CreateRef<Magma::Material>();
 	redMaterial->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 	redMaterial->SetMetallic(1.0f);
-	redMaterial->SetRoughness(0.2f);
+	redMaterial->SetRoughness(0.0f);
 
 	const auto& transform = Magma::CreateRef<Magma::Transform>(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.5f, -0.75f)));
 	const auto& gameObject1 = Magma::CreateRef<Magma::GameObject>(transform);

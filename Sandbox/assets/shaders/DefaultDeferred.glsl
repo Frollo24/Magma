@@ -37,6 +37,7 @@ layout(set = 1, binding = 2) uniform sampler2D t_AlbedoTexture;
 layout(set = 1, binding = 3) uniform sampler2D t_NormalMetalRoughnessTexture;
 
 #include "include/PBRFunctions.glslh"
+#include "include/IBLFunctions.glslh"
 
 vec3 calcDirLight(DirLight light, Material material, vec3 N, vec3 V, vec3 F0) {
 	// Per-light radiance
@@ -128,9 +129,11 @@ void main() {
 	float NdotV = max(dot(N, V), 0.0000001);
 	vec3 F = FresnelSchlick(NdotV, F0);
 	vec3 kD = (1.0 - F) * (1.0 - material.metallic);
-	vec3 IBL = vec3(0.15); // TODO: sample skybox color here when possible
-	vec3 diffuse = IBL * material.albedo.rgb * kD;
-	vec3 specular = IBL * F * (1.0 - material.roughness);
+	vec3 R = reflect(-V, N);
+	vec3 environment = IBL(material, N, V);
+
+	vec3 diffuse = textureLod(t_IrradianceMap, R, 10).rgb * material.albedo.rgb * kD;
+	vec3 specular = environment * F * (1.0 - material.roughness);
 
 	vec3 hdrColor = ambient + light + diffuse + specular;
 	vec3 color = vec3(1.0) - exp(-hdrColor * u_PhysCamera.exposure);

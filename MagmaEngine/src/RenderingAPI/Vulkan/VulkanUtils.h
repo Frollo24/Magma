@@ -93,6 +93,7 @@ namespace Magma
 		VkFormat format;
 		VkImageTiling tiling;
 		u32 mipLevels = 1;
+		u32 layers = 1;
 	};
 
 	static void CreateImage(VkPhysicalDevice physicalDevice, VkDevice device, VulkanImageProperties imageProperties,
@@ -103,13 +104,16 @@ namespace Magma
 		imageInfo.imageType = imageProperties.type;
 		imageInfo.extent = imageProperties.extent;
 		imageInfo.mipLevels = imageProperties.mipLevels;
-		imageInfo.arrayLayers = 1;
+		imageInfo.arrayLayers = imageProperties.layers;
 		imageInfo.format = imageProperties.format;
 		imageInfo.tiling = imageProperties.tiling;
 		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageInfo.samples = imageProperties.numSamples;
 		imageInfo.usage = usage;
 		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		if (imageProperties.layers == 6)
+			imageInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 
 		VkResult result = vkCreateImage(device, &imageInfo, nullptr, &image);
 		MGM_CORE_VERIFY(result == VK_SUCCESS);
@@ -169,7 +173,7 @@ namespace Magma
 		}
 	}
 
-	static void TransitionImageLayout(VkCommandBuffer transitionCommand, VkImage image, FramebufferTextureFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, u32 mipLevels = 1)
+	static void TransitionImageLayout(VkCommandBuffer transitionCommand, VkImage image, FramebufferTextureFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, u32 mipLevels = 1, u32 layers = 1)
 	{
 		VkImageMemoryBarrier barrier{};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -186,7 +190,7 @@ namespace Magma
 		barrier.subresourceRange.baseMipLevel = 0;
 		barrier.subresourceRange.levelCount = mipLevels;
 		barrier.subresourceRange.baseArrayLayer = 0;
-		barrier.subresourceRange.layerCount = 1;
+		barrier.subresourceRange.layerCount = layers;
 
 		VkPipelineStageFlags sourceStage = VK_PIPELINE_STAGE_NONE_KHR;
 		VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_NONE_KHR;
@@ -208,7 +212,7 @@ namespace Magma
 		);
 	}
 
-	static void CopyBufferToImage(VkCommandBuffer copyCommand, VkBuffer buffer, VkImage image, uint32_t width, uint32_t height)
+	static void CopyBufferToImage(VkCommandBuffer copyCommand, VkBuffer buffer, VkImage image, u32 width, u32 height, u32 layers = 1)
 	{
 		VkBufferImageCopy region{};
 		region.bufferOffset = 0;
@@ -218,7 +222,7 @@ namespace Magma
 		region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		region.imageSubresource.mipLevel = 0;
 		region.imageSubresource.baseArrayLayer = 0;
-		region.imageSubresource.layerCount = 1;
+		region.imageSubresource.layerCount = layers;
 
 		region.imageOffset = { 0, 0, 0 };
 		region.imageExtent = { width, height, 1 };

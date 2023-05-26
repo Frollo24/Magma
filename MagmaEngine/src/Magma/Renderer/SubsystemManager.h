@@ -16,6 +16,7 @@ namespace Magma
 		static void InitDefaultDeferredSubsystem();
 
 		static void InitUniformBuffers();
+		static void InitTextures();
 	};
 }
 

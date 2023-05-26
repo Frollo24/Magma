@@ -30,6 +30,8 @@ namespace Magma
 	static Ref<UniformBuffer> s_FogUniformBuffer = nullptr; // Fog
 	static Ref<UniformBuffer> s_PhysicalCameraUniformBuffer = nullptr; // PhysicalCamera
 	static Ref<UniformBuffer> s_LightsUniformBuffer = nullptr; // Lights
+	static Ref<Texture2D> s_PreintegratedFG = nullptr; // BRDF-LuT
+	static Ref<TextureCube> s_Skybox = nullptr; // BRDF-LuT
 
 	void SubsystemManager::InitSubsystems()
 	{
@@ -41,11 +43,12 @@ namespace Magma
 		s_DepthbufferTexture = FramebufferTexture2D::Create(device, FramebufferTextureFormat::Depth, width, height);
 
 		InitUniformBuffers();
+		InitTextures();
 
 		// TODO: enable subsystem selection
 		InitDepthPrepassSubsystem();
 		// InitSimpleSubsystem();
-#if true
+#if false
 		InitDefaultGBufferSubsystem();
 		InitDefaultDeferredSubsystem();
 #else
@@ -59,6 +62,8 @@ namespace Magma
 		s_FogUniformBuffer = nullptr;
 		s_PhysicalCameraUniformBuffer = nullptr;
 		s_LightsUniformBuffer = nullptr;
+		s_PreintegratedFG = nullptr;
+		s_Skybox = nullptr;
 
 		s_PositionsViewTexture = nullptr;
 		s_PositionsWorldTexture = nullptr;
@@ -194,8 +199,10 @@ namespace Magma
 		DescriptorBinding fogSettings{ DescriptorType::UniformBuffer, 1 };
 		DescriptorBinding physicalCamera{ DescriptorType::UniformBuffer, 2 };
 		DescriptorBinding lights{ DescriptorType::UniformBuffer, 3 };
+		DescriptorBinding brdfLut{ DescriptorType::ImageSampler, 4 };
+		DescriptorBinding skybox{ DescriptorType::ImageSampler, 5 };
 		DescriptorSetLayoutSpecification sceneLayout{};
-		sceneLayout.Bindings = { cameraTransforms, fogSettings, physicalCamera, lights };
+		sceneLayout.Bindings = { cameraTransforms, fogSettings, physicalCamera, lights, brdfLut, skybox };
 
 		Ref<DescriptorSetLayout> descriptorLayout = DescriptorSetLayout::Create(sceneLayout, device);
 		Ref<DescriptorSet> descriptorSet = DescriptorSet::Create(device, descriptorLayout, Renderer::GetDescriptorPool());
@@ -204,6 +211,8 @@ namespace Magma
 		descriptorSet->WriteUniformBuffer(s_FogUniformBuffer, (u32)sizeof(FogUBO));
 		descriptorSet->WriteUniformBuffer(s_PhysicalCameraUniformBuffer, (u32)sizeof(PhysicalCameraUBO));
 		descriptorSet->WriteUniformBuffer(s_LightsUniformBuffer, (u32)sizeof(LightsUBO));
+		descriptorSet->WriteTexture2D(s_PreintegratedFG);
+		descriptorSet->WriteTextureCube(s_Skybox);
 
 		const auto& shader = Shader::Create("assets/shaders/DefaultLighting.glsl");
 		PipelineSpecification pipelineSpec{};
@@ -258,8 +267,10 @@ namespace Magma
 		DescriptorBinding fogSettings{ DescriptorType::UniformBuffer, 1 };
 		DescriptorBinding physicalCamera{ DescriptorType::UniformBuffer, 2 };
 		DescriptorBinding lights{ DescriptorType::UniformBuffer, 3 };
+		DescriptorBinding brdfLut{ DescriptorType::ImageSampler, 4 };
+		DescriptorBinding skybox{ DescriptorType::ImageSampler, 5 };
 		DescriptorSetLayoutSpecification sceneLayout{};
-		sceneLayout.Bindings = { cameraTransforms, fogSettings, physicalCamera, lights };
+		sceneLayout.Bindings = { cameraTransforms, fogSettings, physicalCamera, lights, brdfLut, skybox };
 
 		Ref<DescriptorSetLayout> descriptorLayout = DescriptorSetLayout::Create(sceneLayout, device);
 		Ref<DescriptorSet> descriptorSet = DescriptorSet::Create(device, descriptorLayout, Renderer::GetDescriptorPool());
@@ -268,6 +279,8 @@ namespace Magma
 		descriptorSet->WriteUniformBuffer(s_FogUniformBuffer, (u32)sizeof(FogUBO));
 		descriptorSet->WriteUniformBuffer(s_PhysicalCameraUniformBuffer, (u32)sizeof(PhysicalCameraUBO));
 		descriptorSet->WriteUniformBuffer(s_LightsUniformBuffer, (u32)sizeof(LightsUBO));
+		descriptorSet->WriteTexture2D(s_PreintegratedFG);
+		descriptorSet->WriteTextureCube(s_Skybox);
 
 		const auto& shader = Shader::Create("assets/shaders/GBuffer.glsl");
 		PipelineSpecification pipelineSpec{};
@@ -329,8 +342,10 @@ namespace Magma
 		DescriptorBinding fogSettings{ DescriptorType::UniformBuffer, 1 };
 		DescriptorBinding physicalCamera{ DescriptorType::UniformBuffer, 2 };
 		DescriptorBinding lights{ DescriptorType::UniformBuffer, 3 };
+		DescriptorBinding brdfLut{ DescriptorType::ImageSampler, 4 };
+		DescriptorBinding skybox{ DescriptorType::ImageSampler, 5 };
 		DescriptorSetLayoutSpecification sceneLayout{};
-		sceneLayout.Bindings = { cameraTransforms, fogSettings, physicalCamera, lights };
+		sceneLayout.Bindings = { cameraTransforms, fogSettings, physicalCamera, lights, brdfLut, skybox };
 
 		// Geometry Layout
 		DescriptorBinding positionsView{ DescriptorType::ImageSampler, 0 };
@@ -349,6 +364,8 @@ namespace Magma
 		sceneSet->WriteUniformBuffer(s_FogUniformBuffer, (u32)sizeof(FogUBO));
 		sceneSet->WriteUniformBuffer(s_PhysicalCameraUniformBuffer, (u32)sizeof(PhysicalCameraUBO));
 		sceneSet->WriteUniformBuffer(s_LightsUniformBuffer, (u32)sizeof(LightsUBO));
+		sceneSet->WriteTexture2D(s_PreintegratedFG);
+		sceneSet->WriteTextureCube(s_Skybox);
 
 		geomSet->WriteFramebufferTexture2D(s_PositionsViewTexture);
 		s_PositionsWorldTexture->SetBinding(1);
@@ -428,5 +445,26 @@ namespace Magma
 		dirLight.intensity = 10.0f;
 		lightsUbo.dirLight[0] = dirLight;
 		s_LightsUniformBuffer->SetCommonDataForAllFrames(&lightsUbo, sizeof(lightsUbo));
+	}
+
+	void SubsystemManager::InitTextures()
+	{
+		const auto& instance = Application::Instance().GetWindow().GetGraphicsInstance();
+		const auto& device = instance->GetDevice();
+
+		s_PreintegratedFG = Texture2D::Create(device, "assets/textures/PreintegratedFG.bmp");
+		s_PreintegratedFG->SetBinding(4); // From SceneSet.glslh
+
+		const std::array<std::string, 6> skyboxLayers =
+		{
+			"assets/textures/skybox/right.jpg",
+			"assets/textures/skybox/left.jpg",
+			"assets/textures/skybox/up.jpg",
+			"assets/textures/skybox/down.jpg",
+			"assets/textures/skybox/front.jpg",
+			"assets/textures/skybox/back.jpg",
+		};
+		s_Skybox = TextureCube::Create(device, skyboxLayers);
+		s_Skybox->SetBinding(5); // From SceneSet.glslh
 	}
 }

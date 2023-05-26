@@ -12,6 +12,7 @@ namespace Magma
 	{
 		None,
 		RGBA8,
+		RGBA16F,
 		D24S8,
 		D32
 	};
@@ -47,6 +48,8 @@ namespace Magma
 		virtual ~RenderPass() = default;
 
 		static Ref<RenderPass> Create(const RenderPassSpecification& spec, const Ref<RenderDevice>& device);
+
+		inline virtual u32 GetColorAttachmentsCount() = 0;
 
 		inline const RenderPassSpecification& GetSpecification() const { return m_Specification; }
 

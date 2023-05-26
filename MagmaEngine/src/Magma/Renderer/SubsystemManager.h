@@ -11,7 +11,11 @@ namespace Magma
 	private:
 		static void InitDepthPrepassSubsystem();
 		static void InitSimpleSubsystem();
-		static void InitDefaultSubsystem();
+		static void InitDefaultForwardSubsystem();
+		static void InitDefaultGBufferSubsystem();
+		static void InitDefaultDeferredSubsystem();
+
+		static void InitUniformBuffers();
 	};
 }
 

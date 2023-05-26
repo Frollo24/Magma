@@ -16,6 +16,14 @@ namespace Magma
 		}
 	}
 
+	Material::~Material()
+	{
+		for (auto& texture : m_MaterialTextures)
+			texture = nullptr;
+
+		m_DescriptorSet = nullptr;
+	}
+
 	void Material::SetTexture(const Ref<Texture2D>& texture, const TextureType& type)
 	{
 		texture->SetBinding((u32)type);

@@ -60,7 +60,7 @@ layout(set = 1, binding = 0) uniform sampler2D t_AlbedoTexture;
 layout(set = 1, binding = 1) uniform sampler2D t_NormalTexture;
 layout(set = 1, binding = 2) uniform sampler2D t_MetallicTexture;
 layout(set = 1, binding = 3) uniform sampler2D t_RoughnessTexture;
-layout(set = 1, binding = 4) uniform sampler2D t_EmmisiveTexture;
+layout(set = 1, binding = 4) uniform sampler2D t_EmissiveTexture;
 
 layout(push_constant) uniform Push {
 	mat4 model;
@@ -173,6 +173,8 @@ void main(){
 	vec3 color = vec3(1.0) - exp(-hdrColor * u_PhysCamera.exposure);
 	color = addFog(color);
 	o_Color = vec4(color, 1.0);
+	o_Color = vec4(vec3(NdotV), 1.0);
+	o_Color = vec4(vec3(N.z), 1.0);
 
 	o_Coords = vec4(v_Position.xyz, 1.0);
 }

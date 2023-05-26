@@ -9,9 +9,10 @@ namespace Magma
 	{
 		switch (format)
 		{
-			case AttachmentFormat::RGBA8: return VK_FORMAT_R8G8B8A8_SRGB;
-			case AttachmentFormat::D24S8: return VK_FORMAT_D24_UNORM_S8_UINT;
-			case AttachmentFormat::D32:   return VK_FORMAT_D32_SFLOAT;
+			case AttachmentFormat::RGBA8:   return VK_FORMAT_R8G8B8A8_SRGB;
+			case AttachmentFormat::RGBA16F: return VK_FORMAT_R16G16B16A16_SFLOAT;
+			case AttachmentFormat::D24S8:   return VK_FORMAT_D24_UNORM_S8_UINT;
+			case AttachmentFormat::D32:     return VK_FORMAT_D32_SFLOAT;
 			default: return VK_FORMAT_UNDEFINED;
 		}
 	}
@@ -82,6 +83,7 @@ namespace Magma
 			switch (attachment)
 			{
 				case AttachmentFormat::RGBA8:
+				case AttachmentFormat::RGBA16F:
 					attachmentDesc = CreateColorAttachment(attachment, m_Specification.IsSwapchainTarget, (u8)(m_Specification.ClearValues.ClearFlags & ClearFlags::Color),
 						m_Specification.Samples, attachmentRef, attachmentIndex);
 					colorAttachmentsDescs.push_back(attachmentDesc);
@@ -106,9 +108,10 @@ namespace Magma
 			attachmentIndex++;
 		}
 
+		m_ColorAttachmentCount = static_cast<u32>(colorAttachmentsRefs.size());
 		VkSubpassDescription subpass{};
 		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.colorAttachmentCount = static_cast<u32>(colorAttachmentsRefs.size());
+		subpass.colorAttachmentCount = m_ColorAttachmentCount;
 		subpass.pColorAttachments = colorAttachmentsRefs.data();
 		subpass.pDepthStencilAttachment = hasDepthAttachment ? &depthAttachmentRef : nullptr;
 
@@ -119,7 +122,6 @@ namespace Magma
 		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 		dependency.srcAccessMask = 0;
 		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		dependency.dependencyFlags = 0;
 
 		VkRenderPassCreateInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;

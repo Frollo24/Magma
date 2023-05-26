@@ -132,8 +132,11 @@ namespace Magma
 	{
 		switch (format)
 		{
-			case FramebufferTextureFormat::RGBA8: return VK_IMAGE_ASPECT_COLOR_BIT;
-			case FramebufferTextureFormat::Color: return VK_IMAGE_ASPECT_COLOR_BIT;
+			case FramebufferTextureFormat::RGBA8:          return VK_IMAGE_ASPECT_COLOR_BIT;
+			case FramebufferTextureFormat::Color:          return VK_IMAGE_ASPECT_COLOR_BIT;
+			case FramebufferTextureFormat::RGBA16F:        return VK_IMAGE_ASPECT_COLOR_BIT;
+			case FramebufferTextureFormat::Depth:          return VK_IMAGE_ASPECT_DEPTH_BIT;
+			case FramebufferTextureFormat::DepthStencil:   return (VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT );
 			default: return VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM;
 		}
 	}

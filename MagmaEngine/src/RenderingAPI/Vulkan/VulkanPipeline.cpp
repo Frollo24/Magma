@@ -156,13 +156,13 @@ namespace Magma
 		colorBlendAttachment.dstAlphaBlendFactor = (VkBlendFactor)m_Specification.PipelineBlendState.AlphaEquation.DstFactor;
 		colorBlendAttachment.alphaBlendOp = (VkBlendOp)m_Specification.PipelineBlendState.AlphaEquation.Operation;
 
-		// TODO: add support for multiple color blend attachments
+		std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments(m_RenderPass->GetColorAttachmentsCount(), colorBlendAttachment);
 		VkPipelineColorBlendStateCreateInfo colorBlendingInfo{};
 		colorBlendingInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 		colorBlendingInfo.logicOpEnable = VK_FALSE;
 		colorBlendingInfo.logicOp = VK_LOGIC_OP_COPY;
-		colorBlendingInfo.attachmentCount = 1;
-		colorBlendingInfo.pAttachments = &colorBlendAttachment;
+		colorBlendingInfo.attachmentCount = static_cast<u32>(colorBlendAttachments.size());
+		colorBlendingInfo.pAttachments = colorBlendAttachments.data();
 		colorBlendingInfo.blendConstants[0] = m_Specification.PipelineBlendState.ConstantColor.R;
 		colorBlendingInfo.blendConstants[1] = m_Specification.PipelineBlendState.ConstantColor.G;
 		colorBlendingInfo.blendConstants[2] = m_Specification.PipelineBlendState.ConstantColor.B;

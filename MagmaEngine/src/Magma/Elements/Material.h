@@ -21,6 +21,7 @@ namespace Magma
 	{
 	public:
 		Material(const glm::vec4& color = glm::vec4(1.0f), const float& metallic = 0.5f, const float& roughness = 1.0f);
+		~Material();
 
 		inline const glm::vec4& GetColor() const { return m_Color; }
 		inline void SetColor(const glm::vec4& color) { m_Color = color; }

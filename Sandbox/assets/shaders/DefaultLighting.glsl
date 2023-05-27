@@ -174,7 +174,7 @@ void main(){
 	vec3 diffuse = textureLod(t_IrradianceMap, R, 10).rgb * material.albedo.rgb * kD;
 	vec3 specular = environment * F * (1.0 - material.roughness);
 
-	vec3 hdrColor = ambient + light + diffuse + specular;
+	vec3 hdrColor = ambient + diffuse + specular + light;
 	vec3 color = vec3(1.0) - exp(-hdrColor * u_PhysCamera.exposure);
 	color = addFog(color);
 	o_Color = vec4(color, 1.0);

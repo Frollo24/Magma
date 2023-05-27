@@ -9,7 +9,7 @@ namespace Magma
 	class VulkanTexture2D : public Texture2D
 	{
 	public:
-		VulkanTexture2D(const Ref<RenderDevice>& device, const std::string& filepath, const bool generateMipmapsOnLoad = true);
+		VulkanTexture2D(const Ref<RenderDevice>& device, const std::string& filepath, const TextureSpecs& specs, const bool generateMipmapsOnLoad = true);
 		virtual ~VulkanTexture2D();
 
 		virtual void SetData(const void* data, u32 size) override;

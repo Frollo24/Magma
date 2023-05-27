@@ -9,6 +9,7 @@ namespace Magma
 	{
 		switch (format)
 		{
+			case AttachmentFormat::R8:      return VK_FORMAT_R8_SNORM;
 			case AttachmentFormat::RGBA8:   return VK_FORMAT_R8G8B8A8_SRGB;
 			case AttachmentFormat::RGBA16F: return VK_FORMAT_R16G16B16A16_SFLOAT;
 			case AttachmentFormat::D24S8:   return VK_FORMAT_D24_UNORM_S8_UINT;
@@ -82,6 +83,7 @@ namespace Magma
 
 			switch (attachment)
 			{
+				case AttachmentFormat::R8:
 				case AttachmentFormat::RGBA8:
 				case AttachmentFormat::RGBA16F:
 					attachmentDesc = CreateColorAttachment(attachment, m_Specification.IsSwapchainTarget, (u8)(m_Specification.ClearValues.ClearFlags & ClearFlags::Color),

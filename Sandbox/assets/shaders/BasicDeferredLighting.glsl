@@ -43,6 +43,7 @@ layout(set = 1, binding = 0) uniform sampler2D t_PositionTexture;
 layout(set = 1, binding = 1) uniform sampler2D t_PosWorldTexture;
 layout(set = 1, binding = 2) uniform sampler2D t_AlbedoTexture;
 layout(set = 1, binding = 3) uniform sampler2D t_NormalMetalRoughnessTexture;
+layout(set = 1, binding = 4) uniform sampler2D t_SSAOTexture;
 
 layout(push_constant) uniform Push{
 	mat4 model;
@@ -58,6 +59,9 @@ void main() {
 	normal = normalize(normal);
 	vec3 lightDir = normalize(-lights.dirLight.direction);
 
+	// ambient occlusion
+	float AO = texture(t_SSAOTexture, v_TexCoord).r;
+
 	// diffuse shading
 	float diff = max(dot(normal, lightDir), 0.0);
 
@@ -72,6 +76,6 @@ void main() {
 	vec3 diffuse = lights.dirLight.color.rgb * diff * fragColor;
 	vec3 specular = lights.dirLight.color.rgb * spec * fragColor;
 
-	vec3 color = ambient + (diffuse + specular) * lights.dirLight.intensity;
+	vec3 color = (ambient * AO) + (diffuse + specular) * lights.dirLight.intensity;
 	o_Color = vec4(color, 1.0);
 }

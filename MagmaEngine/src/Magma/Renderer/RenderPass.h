@@ -11,6 +11,7 @@ namespace Magma
 	enum class AttachmentFormat
 	{
 		None,
+		R8,
 		RGBA8,
 		RGBA16F,
 		D24S8,

@@ -244,6 +244,7 @@ namespace Magma
 		{
 			switch (renderPass->GetSpecification().Attachments[i])
 			{
+				case AttachmentFormat::R8:
 				case AttachmentFormat::RGBA8:
 					clearValue[i].color = { color.r, color.g, color.b, color.a };
 					break;

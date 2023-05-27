@@ -36,5 +36,7 @@ namespace Magma
 			m_View = glm::rotate(glm::mat4(1.0f), glm::radians(-30.0f) * (float)Time::DeltaTime, glm::vec3(1.0f, 0.0f, 0.0f)) * m_View;
 		if (Input::IsKeyPressed(KeyCode::Down))
 			m_View = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f) * (float)Time::DeltaTime, glm::vec3(1.0f, 0.0f, 0.0f)) * m_View;
+
+		RecalculateViewProjMatrix();
 	}
 }

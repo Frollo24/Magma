@@ -7,6 +7,7 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	const auto& instance = Magma::Application::Instance().GetWindow().GetGraphicsInstance();
 	const auto& device = instance->GetDevice();
 	const auto& model = Magma::CreateRef<Magma::Model>("assets/models/UVSphere.obj", device);
+	const auto& bunny = Magma::CreateRef<Magma::Model>("assets/models/reshiram.obj", device);
 	const auto& whiteMaterial = Magma::CreateRef<Magma::Material>();
 	whiteMaterial->SetRoughness(0.0f);
 	const auto& redMaterial = Magma::CreateRef<Magma::Material>();
@@ -16,6 +17,8 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	const auto& simpleMaterial = Magma::CreateRef<Magma::Material>();
 	simpleMaterial->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
 	simpleMaterial->SetIsPBR(false);
+	const auto& bunnyMaterial = Magma::CreateRef<Magma::Material>();
+	bunnyMaterial->SetIsPBR(false);
 
 	const auto& transform1 = Magma::CreateRef<Magma::Transform>(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.5f, -0.75f)));
 	const auto& gameObject1 = Magma::CreateRef<Magma::GameObject>(transform1);
@@ -36,6 +39,13 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	meshRenderer3->SetMaterial(simpleMaterial);
 	gameObject3->SetMeshRenderer(meshRenderer3);
 	Magma::Renderer::AddGameObject(gameObject3);
+
+	const auto& transform4 = Magma::CreateRef<Magma::Transform>(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, -2.5f)), glm::vec3(0.1f)));
+	const auto& gameObject4 = Magma::CreateRef<Magma::GameObject>(transform4);
+	const auto& meshRenderer4 = Magma::CreateRef<Magma::MeshRenderer>(bunny);
+	meshRenderer4->SetMaterial(bunnyMaterial);
+	gameObject4->SetMeshRenderer(meshRenderer4);
+	Magma::Renderer::AddGameObject(gameObject4);
 }
 
 SandboxLayer::~SandboxLayer()
@@ -45,6 +55,7 @@ SandboxLayer::~SandboxLayer()
 void SandboxLayer::OnUpdate()
 {
 	Magma::Camera::Main->Update();
+	Magma::Renderer::Update();
 	Magma::Renderer::RenderGameObjects();
 	Magma::Renderer::DrawToScreen();
 }

@@ -24,6 +24,21 @@ namespace Magma
 		};
 	};
 
+	struct TextureSpecs
+	{
+		enum class Filtering
+		{
+			Nearest, Linear
+		};
+		enum class Wrapping
+		{
+			Repeat, Clamp
+		};
+
+		Filtering Filter = Filtering::Linear;
+		Wrapping Wrap = Wrapping::Repeat;
+	};
+
 	class MAGMA_API Texture
 	{
 	public:
@@ -46,7 +61,7 @@ namespace Magma
 	class MAGMA_API Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> Create(const Ref<RenderDevice>& device, const std::string& filepath, const bool generateMipmapsOnLoad = true);
+		static Ref<Texture2D> Create(const Ref<RenderDevice>& device, const std::string& filepath, const TextureSpecs& specs = {}, const bool generateMipmapsOnLoad = true);
 
 	protected:
 		u32 m_MipLevels = 1;

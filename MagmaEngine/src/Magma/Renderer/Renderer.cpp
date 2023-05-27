@@ -31,7 +31,7 @@ namespace Magma
 
 	void Renderer::Init()
 	{
-		Camera::Main = CreateRef<Camera>(glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.3f, 10.0f));
+		Camera::Main = CreateRef<Camera>(glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.3f, 50.0f));
 		Camera::Main->SetView(glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 		s_Camera = Camera::Main;
 
@@ -170,5 +170,10 @@ namespace Magma
 	const Ref<RenderDevice>& Renderer::GetDevice()
 	{
 		return s_RendererData->RenderDevice;
+	}
+
+	void Renderer::Update()
+	{
+		SubsystemManager::Update();
 	}
 }

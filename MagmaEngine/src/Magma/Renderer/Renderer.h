@@ -33,6 +33,8 @@ namespace Magma
 		static const Ref<DescriptorSetLayout>& GetMaterialDescriptorSetLayout();
 		static const Ref<RenderDevice>& GetDevice();
 
+		static void Update();
+
 	private:
 		static bool s_BegunFrame;
 		static Ref<Camera> s_Camera;

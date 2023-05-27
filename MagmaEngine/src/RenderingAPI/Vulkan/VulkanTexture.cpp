@@ -9,7 +9,18 @@
 
 namespace Magma
 {
-	VulkanTexture2D::VulkanTexture2D(const Ref<RenderDevice>& device, const std::string& filepath, const bool generateMipmapsOnLoad)
+	static VkFilter TextureSpecsFilterToVkFilter(const TextureSpecs::Filtering& filtering)
+	{
+		switch (filtering)
+		{
+			case TextureSpecs::Filtering::Linear:  return VK_FILTER_LINEAR;
+			case TextureSpecs::Filtering::Nearest: return VK_FILTER_NEAREST;
+			default:
+				return VK_FILTER_MAX_ENUM;
+		}
+	}
+
+	VulkanTexture2D::VulkanTexture2D(const Ref<RenderDevice>& device, const std::string& filepath, const TextureSpecs& specs, const bool generateMipmapsOnLoad)
 		: m_VulkanDevice(DynamicCast<VulkanDevice>(device))
 	{
 		m_PhysicalDevice = m_VulkanDevice->GetPhysicalDevice();
@@ -78,10 +89,12 @@ namespace Magma
 		VkResult result = vkCreateImageView(m_Device, &viewInfo, nullptr, &m_ImageView);
 		MGM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create texture imageview!");
 
+		VkFilter filter = TextureSpecsFilterToVkFilter(specs.Filter);
+
 		VkSamplerCreateInfo samplerInfo{};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-		samplerInfo.magFilter = VK_FILTER_LINEAR;
-		samplerInfo.minFilter = VK_FILTER_LINEAR;
+		samplerInfo.magFilter = filter;
+		samplerInfo.minFilter = filter;
 		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
@@ -223,6 +236,7 @@ namespace Magma
 	{
 		switch (format)
 		{
+			case FramebufferTextureFormat::Red:          return VK_FORMAT_R8_SNORM;
 			case FramebufferTextureFormat::RGBA8:        return VK_FORMAT_R8G8B8A8_SRGB;
 			case FramebufferTextureFormat::Color:        return VK_FORMAT_R8G8B8A8_SRGB;
 			case FramebufferTextureFormat::RGBA16F:      return VK_FORMAT_R16G16B16A16_SFLOAT;
@@ -236,6 +250,7 @@ namespace Magma
 	{
 		switch (format)
 		{
+			case FramebufferTextureFormat::Red:          return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 			case FramebufferTextureFormat::RGBA8:        return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 			case FramebufferTextureFormat::Color:        return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 			case FramebufferTextureFormat::RGBA16F:      return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -249,6 +264,7 @@ namespace Magma
 	{
 		switch (format)
 		{
+			case FramebufferTextureFormat::Red:          return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			case FramebufferTextureFormat::RGBA8:        return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			case FramebufferTextureFormat::Color:        return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			case FramebufferTextureFormat::RGBA16F:      return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;

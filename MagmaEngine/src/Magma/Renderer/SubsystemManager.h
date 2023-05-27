@@ -6,6 +6,7 @@ namespace Magma
 	{
 	public:
 		static void InitSubsystems();
+		static void Update();
 		static void Shutdown();
 
 	private:
@@ -15,8 +16,11 @@ namespace Magma
 		static void InitDefaultGBufferSubsystem();
 		static void InitDefaultDeferredSubsystem();
 		static void InitSimpleDeferredSubsystem();
+		static void InitSSAOKernelSubsystem();
+		static void InitSSAOBlurSubsystem();
 		static void InitSkyboxSubsystem();
 
+		static void InitDescriptorLayouts();
 		static void InitUniformBuffers();
 		static void InitTextures();
 	};

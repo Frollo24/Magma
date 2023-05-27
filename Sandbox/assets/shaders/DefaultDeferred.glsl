@@ -35,6 +35,7 @@ layout(set = 1, binding = 0) uniform sampler2D t_PositionTexture;
 layout(set = 1, binding = 1) uniform sampler2D t_PosWorldTexture;
 layout(set = 1, binding = 2) uniform sampler2D t_AlbedoTexture;
 layout(set = 1, binding = 3) uniform sampler2D t_NormalMetalRoughnessTexture;
+layout(set = 1, binding = 4) uniform sampler2D t_SSAOTexture;
 
 #include "include/PBRFunctions.glslh"
 #include "include/IBLFunctions.glslh"
@@ -115,6 +116,7 @@ void main() {
 	vec3 N = normalize(normal);
 	vec3 V = normalize(-texPosition.xyz);
 
+	float AO = texture(t_SSAOTexture, v_TexCoord).r;
 	vec3 ambient = 0.03 * material.albedo.rgb;
 	vec3 F0 = mix(vec3(0.04), material.albedo.rgb, vec3(material.metallic));
 
@@ -135,7 +137,7 @@ void main() {
 	vec3 diffuse = textureLod(t_IrradianceMap, R, 10).rgb * material.albedo.rgb * kD;
 	vec3 specular = environment * F * (1.0 - material.roughness);
 
-	vec3 hdrColor = ambient + light + diffuse + specular;
+	vec3 hdrColor = (ambient + diffuse) * AO + specular + light;
 	vec3 color = vec3(1.0) - exp(-hdrColor * u_PhysCamera.exposure);
 	color = addFog(color);
 	o_Color = vec4(color, 1.0);

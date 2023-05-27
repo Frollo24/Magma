@@ -21,6 +21,7 @@ layout(push_constant) uniform Push {
 	vec4 tint;
 	float metallic;
 	float roughness;
+	float isPBR;
 } push;
 
 void main() {
@@ -67,6 +68,7 @@ layout(push_constant) uniform Push {
 	vec4 tint;
 	float metallic;
 	float roughness;
+	float isPBR;
 } push;
 
 #include "include/PBRFunctions.glslh"

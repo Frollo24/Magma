@@ -15,6 +15,11 @@ namespace Magma
 
 	bool SimpleRenderSubsystem::IsGameObjectSuitable(const Ref<GameObject>& gameObject)
 	{
+		if (!gameObject->GetMeshRenderer()) return false;
+
+		auto& material = gameObject->GetMeshRenderer()->GetMaterial();
+		if (material->GetIsPBR()) return false;
+
 		return true;
 	}
 

@@ -21,6 +21,8 @@ namespace Magma
 		if (!gameObject->GetMeshRenderer()) return false;
 
 		auto& material = gameObject->GetMeshRenderer()->GetMaterial();
+		if (!m_EnableNonPBR && !material->GetIsPBR()) return false;
+
 		if (m_MaterialTexturesRef.empty())
 			m_DescriptorChunk.PushDescriptorSet(material->GetDescriptorSet());
 
@@ -44,6 +46,7 @@ namespace Magma
 				data.tintColor = material->GetColor();
 				data.metallic = material->GetMetallic();
 				data.roughness = material->GetRoughness();
+				data.isPBR = material->GetIsPBR() ? 1.0f : 0.0f;
 
 				RenderCommand::UploadConstantData(m_Pipeline, sizeof(DefaultConstantData), &data);
 				gameObject->Render();

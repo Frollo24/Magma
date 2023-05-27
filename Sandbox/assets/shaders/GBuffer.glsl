@@ -66,6 +66,7 @@ layout(push_constant) uniform Push{
 	vec4 tint;
 	float metallic;
 	float roughness;
+	float isPBR;
 } push;
 
 struct Material {
@@ -99,7 +100,7 @@ void main() {
 
 	o_Position = vec4(v_Position.xyz, 1.0);
 	o_PosWorld = vec4(v_PosWorld.xyz, 1.0);
-	o_Albedo = texColor * push.tint;
+	o_Albedo = vec4(material.albedo.rgb, push.isPBR);
 	o_NormalMetalRoughness = vec4(normal.xy, material.metallic, material.roughness);
 	// o_EmissiveColor = vec4(0.0); // We don't support emissive colors at the moment
 }

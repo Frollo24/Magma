@@ -20,6 +20,7 @@ namespace Magma
 	static Ref<UniformBuffer> s_SimpleCameraUniformBuffer = nullptr;
 	static Ref<UniformBuffer> s_DirLightUniformBuffer = nullptr;
 
+	static Ref<FramebufferTexture2D> s_ColorbufferTexture = nullptr;
 	static Ref<FramebufferTexture2D> s_DepthbufferTexture = nullptr;
 
 	static Ref<FramebufferTexture2D> s_PositionsViewTexture = nullptr; // Deferred shading textures
@@ -41,6 +42,7 @@ namespace Magma
 
 		u32 width = instance->GetSwapchain()->GetWidth();
 		u32 height = instance->GetSwapchain()->GetHeight();
+		s_ColorbufferTexture = FramebufferTexture2D::Create(device, FramebufferTextureFormat::Color, width, height);
 		s_DepthbufferTexture = FramebufferTexture2D::Create(device, FramebufferTextureFormat::Depth, width, height);
 
 		InitUniformBuffers();
@@ -48,11 +50,12 @@ namespace Magma
 
 		// TODO: enable subsystem selection
 		InitDepthPrepassSubsystem();
-		// InitSimpleSubsystem();
-#if false
+#if true
 		InitDefaultGBufferSubsystem();
 		InitDefaultDeferredSubsystem();
+		InitSimpleDeferredSubsystem();
 #else
+		InitSimpleSubsystem();
 		InitDefaultForwardSubsystem();
 #endif
 		InitSkyboxSubsystem();
@@ -72,6 +75,7 @@ namespace Magma
 		s_AlbedoTexture = nullptr;
 		s_NormalMetalRoughnessTexture = nullptr;
 
+		s_ColorbufferTexture = nullptr;
 		s_DepthbufferTexture = nullptr;
 
 		s_SimpleCameraUniformBuffer = nullptr;
@@ -175,11 +179,10 @@ namespace Magma
 
 		u32 width = instance->GetSwapchain()->GetWidth();
 		u32 height = instance->GetSwapchain()->GetHeight();
-		const auto& framebufferTextureColor = FramebufferTexture2D::Create(device, FramebufferTextureFormat::Color, width, height);
 		FramebufferSpecification framebufferSpec{};
 		framebufferSpec.Width = width;
 		framebufferSpec.Height = height;
-		framebufferSpec.RenderTargets = { framebufferTextureColor, s_DepthbufferTexture };
+		framebufferSpec.RenderTargets = { s_ColorbufferTexture, s_DepthbufferTexture };
 		framebufferSpec.TextureSpecs = { { FramebufferTextureFormat::Color }, { FramebufferTextureFormat::Depth } };
 
 		const auto& framebuffer = Framebuffer::Create(framebufferSpec, device, renderPass);
@@ -188,7 +191,7 @@ namespace Magma
 		const auto& simpleRenderSubsystem = CreateRef<SimpleRenderSubsystem>(pipeline);
 		simpleRenderSubsystem->SetDescriptorChunk({ descriptorSet });
 		Renderer::AddRenderSubsystem(simpleRenderSubsystem);
-		Renderer::SetScreenTexture(framebufferTextureColor);
+		Renderer::SetScreenTexture(s_ColorbufferTexture);
 	}
 
 	void SubsystemManager::InitDefaultForwardSubsystem()
@@ -233,8 +236,6 @@ namespace Magma
 		pipelineSpec.Shader = shader;
 
 		RenderPassSpecification renderPassSpec{};
-		renderPassSpec.ClearValues.ClearFlags = ClearFlags::Color;
-		renderPassSpec.ClearValues.Color = { 0.1f, 0.1f, 0.1f, 1.0f };
 		renderPassSpec.Attachments = { AttachmentFormat::RGBA8, AttachmentFormat::D32 };
 		renderPassSpec.IsSwapchainTarget = false;
 
@@ -243,11 +244,10 @@ namespace Magma
 
 		u32 width = instance->GetSwapchain()->GetWidth();
 		u32 height = instance->GetSwapchain()->GetHeight();
-		const auto& framebufferTextureColor = FramebufferTexture2D::Create(device, FramebufferTextureFormat::Color, width, height);
 		FramebufferSpecification framebufferSpec{};
 		framebufferSpec.Width = width;
 		framebufferSpec.Height = height;
-		framebufferSpec.RenderTargets = { framebufferTextureColor, s_DepthbufferTexture };
+		framebufferSpec.RenderTargets = { s_ColorbufferTexture, s_DepthbufferTexture };
 		framebufferSpec.TextureSpecs = { { FramebufferTextureFormat::Color }, { FramebufferTextureFormat::Depth } };
 
 		const auto& framebuffer = Framebuffer::Create(framebufferSpec, device, renderPass);
@@ -256,7 +256,7 @@ namespace Magma
 		const auto& defaultRenderSubsystem = CreateRef<DefaultRenderSubsystem>(pipeline);
 		defaultRenderSubsystem->SetDescriptorChunk({ descriptorSet });
 		Renderer::AddRenderSubsystem(defaultRenderSubsystem);
-		Renderer::SetScreenTexture(framebufferTextureColor);
+		Renderer::SetScreenTexture(s_ColorbufferTexture);
 	}
 
 	void SubsystemManager::InitDefaultGBufferSubsystem()
@@ -330,6 +330,7 @@ namespace Magma
 		renderPass->SetFramebuffer(framebuffer);
 
 		const auto& gBufferRenderSubsystem = CreateRef<DefaultRenderSubsystem>(pipeline);
+		gBufferRenderSubsystem->EnableNonPBRRendering(true);
 		gBufferRenderSubsystem->SetDescriptorChunk({ descriptorSet });
 		Renderer::AddRenderSubsystem(gBufferRenderSubsystem);
 	}
@@ -397,11 +398,10 @@ namespace Magma
 
 		u32 width = instance->GetSwapchain()->GetWidth();
 		u32 height = instance->GetSwapchain()->GetHeight();
-		const auto& framebufferTextureColor = FramebufferTexture2D::Create(device, FramebufferTextureFormat::Color, width, height);
 		FramebufferSpecification framebufferSpec{};
 		framebufferSpec.Width = width;
 		framebufferSpec.Height = height;
-		framebufferSpec.RenderTargets = { framebufferTextureColor, s_DepthbufferTexture };
+		framebufferSpec.RenderTargets = { s_ColorbufferTexture, s_DepthbufferTexture };
 		framebufferSpec.TextureSpecs = { { FramebufferTextureFormat::Color }, { FramebufferTextureFormat::Depth } };
 
 		const auto& framebuffer = Framebuffer::Create(framebufferSpec, device, renderPass);
@@ -410,7 +410,90 @@ namespace Magma
 		const auto& defaultDeferredSubsystem = CreateRef<DrawToBufferRenderSubsystem>(pipeline);
 		defaultDeferredSubsystem->SetDescriptorChunk({ sceneSet, geomSet });
 		Renderer::AddRenderSubsystem(defaultDeferredSubsystem);
-		Renderer::SetScreenTexture(framebufferTextureColor);
+		Renderer::SetScreenTexture(s_ColorbufferTexture);
+	}
+
+	void SubsystemManager::InitSimpleDeferredSubsystem()
+	{
+		const auto& instance = Application::Instance().GetWindow().GetGraphicsInstance();
+		const auto& device = instance->GetDevice();
+
+		// Scene Layout
+		DescriptorBinding viewProj{ DescriptorType::UniformBuffer, 0 };
+		DescriptorBinding dirLight{ DescriptorType::UniformBuffer, 1 };
+		DescriptorSetLayoutSpecification sceneLayout{};
+		sceneLayout.Bindings = { viewProj, dirLight };
+
+		// Geometry Layout
+		DescriptorBinding positionsView{ DescriptorType::ImageSampler, 0 };
+		DescriptorBinding positionsWorld{ DescriptorType::ImageSampler, 1 };
+		DescriptorBinding albedo{ DescriptorType::ImageSampler, 2 };
+		DescriptorBinding normMetRough{ DescriptorType::ImageSampler, 3 };
+		DescriptorSetLayoutSpecification geomLayout{};
+		geomLayout.Bindings = { positionsView, positionsWorld, albedo, normMetRough };
+
+		Ref<DescriptorSetLayout> sceneDescriptorLayout = DescriptorSetLayout::Create(sceneLayout, device);
+		Ref<DescriptorSetLayout> geomDescriptorLayout = DescriptorSetLayout::Create(geomLayout, device);
+		Ref<DescriptorSet> sceneSet = DescriptorSet::Create(device, sceneDescriptorLayout, Renderer::GetDescriptorPool());
+		Ref<DescriptorSet> geomSet = DescriptorSet::Create(device, geomDescriptorLayout, Renderer::GetDescriptorPool());
+
+		s_SimpleCameraUniformBuffer = UniformBuffer::Create(device, sizeof(SimpleCameraUBO), 0, 2);
+		s_DirLightUniformBuffer = UniformBuffer::Create(device, sizeof(SimpleDirLightUBO), 1, 2);
+		sceneSet->WriteUniformBuffer(s_SimpleCameraUniformBuffer, sizeof(SimpleCameraUBO));
+		sceneSet->WriteUniformBuffer(s_DirLightUniformBuffer, sizeof(SimpleDirLightUBO));
+
+		SimpleCameraUBO cameraData{};
+		cameraData.view = Camera::Main->GetView();
+		cameraData.proj = Camera::Main->GetProjection();
+		cameraData.viewProj = Camera::Main->GetViewProjection();
+
+		SimpleDirLightUBO dirLightData{};
+		dirLightData.color = { 1.0f, 0.99f, 0.96f, 1.0f };
+		dirLightData.direction = { -1.0f, -1.0f, -1.0f };
+		dirLightData.intensity = 1.0f;
+
+		s_SimpleCameraUniformBuffer->SetCommonDataForAllFrames(&cameraData, sizeof(SimpleCameraUBO));
+		s_DirLightUniformBuffer->SetCommonDataForAllFrames(&dirLightData, sizeof(SimpleDirLightUBO));
+
+		geomSet->WriteFramebufferTexture2D(s_PositionsViewTexture);
+		s_PositionsWorldTexture->SetBinding(1);
+		geomSet->WriteFramebufferTexture2D(s_PositionsWorldTexture);
+		s_AlbedoTexture->SetBinding(2);
+		geomSet->WriteFramebufferTexture2D(s_AlbedoTexture);
+		s_NormalMetalRoughnessTexture->SetBinding(3);
+		geomSet->WriteFramebufferTexture2D(s_NormalMetalRoughnessTexture);
+
+		const auto& shader = Shader::Create("assets/shaders/BasicDeferredLighting.glsl");
+		PipelineSpecification pipelineSpec{};
+		pipelineSpec.GlobalDataLayout.DescriptorLayouts.push_back(sceneDescriptorLayout);
+		pipelineSpec.GlobalDataLayout.DescriptorLayouts.push_back(geomDescriptorLayout);
+		pipelineSpec.GlobalDataLayout.ConstantDataSize = sizeof(SimpleConstantData);
+		pipelineSpec.PipelineDepthState.DepthWrite = false;
+		pipelineSpec.PipelineDepthState.DepthFunc = DepthComparison::LessOrEqual;
+		pipelineSpec.Shader = shader;
+
+		RenderPassSpecification renderPassSpec{};
+		renderPassSpec.Attachments = { AttachmentFormat::RGBA8, AttachmentFormat::D32 };
+		renderPassSpec.IsSwapchainTarget = false;
+
+		const auto& renderPass = RenderPass::Create(renderPassSpec, device);
+		const auto& pipeline = Pipeline::Create(pipelineSpec, device, renderPass);
+
+		u32 width = instance->GetSwapchain()->GetWidth();
+		u32 height = instance->GetSwapchain()->GetHeight();
+		FramebufferSpecification framebufferSpec{};
+		framebufferSpec.Width = width;
+		framebufferSpec.Height = height;
+		framebufferSpec.RenderTargets = { s_ColorbufferTexture, s_DepthbufferTexture };
+		framebufferSpec.TextureSpecs = { { FramebufferTextureFormat::Color }, { FramebufferTextureFormat::Depth } };
+
+		const auto& framebuffer = Framebuffer::Create(framebufferSpec, device, renderPass);
+		renderPass->SetFramebuffer(framebuffer);
+
+		const auto& defaultDeferredSubsystem = CreateRef<DrawToBufferRenderSubsystem>(pipeline);
+		defaultDeferredSubsystem->SetDescriptorChunk({ sceneSet, geomSet });
+		Renderer::AddRenderSubsystem(defaultDeferredSubsystem);
+		Renderer::SetScreenTexture(s_ColorbufferTexture);
 	}
 
 	void SubsystemManager::InitSkyboxSubsystem()

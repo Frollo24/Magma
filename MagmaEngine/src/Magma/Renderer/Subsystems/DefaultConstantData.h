@@ -57,5 +57,6 @@ namespace Magma
 		glm::vec4 tintColor;
 		glm::float32 metallic;
 		glm::float32 roughness;
+		glm::float32 isPBR;
 	};
 }

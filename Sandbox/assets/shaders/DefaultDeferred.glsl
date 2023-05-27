@@ -11,7 +11,7 @@ const vec2 ScreenCoords[6] = vec2[](
 	vec2(1.0, 1.0),
 	vec2(-1.0, 1.0),
 	vec2(-1.0, -1.0)
-	);
+);
 
 void main() {
 	v_TexCoord = ScreenCoords[gl_VertexIndex];

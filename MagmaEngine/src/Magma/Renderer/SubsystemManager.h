@@ -14,6 +14,7 @@ namespace Magma
 		static void InitDefaultForwardSubsystem();
 		static void InitDefaultGBufferSubsystem();
 		static void InitDefaultDeferredSubsystem();
+		static void InitSimpleDeferredSubsystem();
 		static void InitSkyboxSubsystem();
 
 		static void InitUniformBuffers();

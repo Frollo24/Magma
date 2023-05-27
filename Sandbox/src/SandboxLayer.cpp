@@ -8,13 +8,17 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	const auto& device = instance->GetDevice();
 	const auto& model = Magma::CreateRef<Magma::Model>("assets/models/UVSphere.obj", device);
 	const auto& whiteMaterial = Magma::CreateRef<Magma::Material>();
+	whiteMaterial->SetRoughness(0.0f);
 	const auto& redMaterial = Magma::CreateRef<Magma::Material>();
 	redMaterial->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 	redMaterial->SetMetallic(1.0f);
 	redMaterial->SetRoughness(0.0f);
+	const auto& simpleMaterial = Magma::CreateRef<Magma::Material>();
+	simpleMaterial->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
+	simpleMaterial->SetIsPBR(false);
 
-	const auto& transform = Magma::CreateRef<Magma::Transform>(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.5f, -0.75f)));
-	const auto& gameObject1 = Magma::CreateRef<Magma::GameObject>(transform);
+	const auto& transform1 = Magma::CreateRef<Magma::Transform>(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.5f, -0.75f)));
+	const auto& gameObject1 = Magma::CreateRef<Magma::GameObject>(transform1);
 	const auto& meshRenderer1 = Magma::CreateRef<Magma::MeshRenderer>(model);
 	meshRenderer1->SetMaterial(whiteMaterial);
 	gameObject1->SetMeshRenderer(meshRenderer1);
@@ -25,6 +29,13 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	meshRenderer2->SetMaterial(redMaterial);
 	gameObject2->SetMeshRenderer(meshRenderer2);
 	Magma::Renderer::AddGameObject(gameObject2);
+
+	const auto& transform3 = Magma::CreateRef<Magma::Transform>(glm::translate(glm::mat4(1.0f), glm::vec3(-2.5f, 0.5f, -1.5f)));
+	const auto& gameObject3 = Magma::CreateRef<Magma::GameObject>(transform3);
+	const auto& meshRenderer3 = Magma::CreateRef<Magma::MeshRenderer>(model);
+	meshRenderer3->SetMaterial(simpleMaterial);
+	gameObject3->SetMeshRenderer(meshRenderer3);
+	Magma::Renderer::AddGameObject(gameObject3);
 }
 
 SandboxLayer::~SandboxLayer()

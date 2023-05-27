@@ -32,6 +32,9 @@ namespace Magma
 		inline const float& GetRoughness() const { return m_Roughness; }
 		inline void SetRoughness(const float& roughness) { m_Roughness = roughness; }
 
+		inline const bool& GetIsPBR() const { return m_IsPBR; }
+		inline void SetIsPBR(const bool& isPBR) { m_IsPBR = isPBR; }
+
 		inline const Ref<Texture2D>& GetTexture(const TextureType& type) { return m_MaterialTextures[(sz)type]; }
 		void SetTexture(const Ref<Texture2D>& texture, const TextureType& type);
 
@@ -41,6 +44,7 @@ namespace Magma
 		glm::vec4 m_Color;
 		float m_Metallic;
 		float m_Roughness;
+		bool m_IsPBR = true; // HACK: material should be rendered depending on the shader
 		Ref<DescriptorSet> m_DescriptorSet = nullptr;
 
 		std::array<Ref<Texture2D>, (sz)TextureType::Count> m_MaterialTextures{};

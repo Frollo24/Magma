@@ -19,6 +19,11 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	simpleMaterial->SetIsPBR(false);
 	const auto& bunnyMaterial = Magma::CreateRef<Magma::Material>();
 	bunnyMaterial->SetIsPBR(false);
+	const auto& ironMaterial = Magma::CreateRef<Magma::Material>();
+	ironMaterial->SetTexture(Magma::Texture2D::Create(device, "assets/textures/iron_rust/rustediron2_basecolor.png"), Magma::TextureType::Albedo);
+	ironMaterial->SetTexture(Magma::Texture2D::Create(device, "assets/textures/iron_rust/rustediron2_normal.png"), Magma::TextureType::Normal);
+	ironMaterial->SetTexture(Magma::Texture2D::Create(device, "assets/textures/iron_rust/rustediron2_metallic.png"), Magma::TextureType::Metallic);
+	ironMaterial->SetTexture(Magma::Texture2D::Create(device, "assets/textures/iron_rust/rustediron2_roughness.png"), Magma::TextureType::Roughness);
 
 	const auto& transform1 = Magma::CreateRef<Magma::Transform>(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.5f, -0.75f)));
 	const auto& gameObject1 = Magma::CreateRef<Magma::GameObject>(transform1);
@@ -40,12 +45,19 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	gameObject3->SetMeshRenderer(meshRenderer3);
 	Magma::Renderer::AddGameObject(gameObject3);
 
-	const auto& transform4 = Magma::CreateRef<Magma::Transform>(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, -2.5f)), glm::vec3(0.05f)));
+	const auto& transform4 = Magma::CreateRef<Magma::Transform>(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, -2.5f)));
 	const auto& gameObject4 = Magma::CreateRef<Magma::GameObject>(transform4);
-	const auto& meshRenderer4 = Magma::CreateRef<Magma::MeshRenderer>(bunny);
-	meshRenderer4->SetMaterial(bunnyMaterial);
+	const auto& meshRenderer4 = Magma::CreateRef<Magma::MeshRenderer>(model);
+	meshRenderer4->SetMaterial(ironMaterial);
 	gameObject4->SetMeshRenderer(meshRenderer4);
 	Magma::Renderer::AddGameObject(gameObject4);
+
+	const auto& transform5 = Magma::CreateRef<Magma::Transform>(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, -2.5f)), glm::vec3(0.05f)));
+	const auto& gameObject5 = Magma::CreateRef<Magma::GameObject>(transform5);
+	const auto& meshRenderer5 = Magma::CreateRef<Magma::MeshRenderer>(bunny);
+	meshRenderer5->SetMaterial(bunnyMaterial);
+	gameObject5->SetMeshRenderer(meshRenderer5);
+	Magma::Renderer::AddGameObject(gameObject5);
 }
 
 SandboxLayer::~SandboxLayer()

@@ -76,8 +76,11 @@ void main() {
 		// Get possible occluder corresponding to sample position in screen-space
 		vec3 occluderPos = texture(t_PositionTexture, offset.xy).rgb;
 
+		// Occluding geometry shouldn't count if it's outside the dome radius
+		float rangeCheck = smoothstep(0.0, 1.0, radius / length(fragPos - occluderPos));
+
 		// In view-space, greater Z values are always closer to the camera
-		occlusion += (occluderPos.z >= samplePos.z + bias ? 1.0 : 0.0);
+		occlusion += (occluderPos.z >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck;
 	}
 
 	o_Color = 1.0 - (occlusion / kernelSize);

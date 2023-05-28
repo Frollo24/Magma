@@ -31,11 +31,11 @@ layout(set = 0, binding = 0) uniform sampler2D t_SSAOTexture; // For simplicity 
 void main() {
 	vec2 texelSize = 1.0 / vec2(textureSize(t_SSAOTexture, 0));
 	float result = 0.0;
-	for (int x = -2; x <= 2; x++) {
-		for (int y = -2; y <= 2; y++) {
+	for (int x = -2; x < 2; x++) {
+		for (int y = -2; y < 2; y++) {
 			vec2 offset = vec2(float(x), float(y)) * texelSize;
 			result += texture(t_SSAOTexture, v_TexCoord + offset).r;
 		}
 	}
-	o_Color = result / 25.0;
+	o_Color = result / 16.0;
 }

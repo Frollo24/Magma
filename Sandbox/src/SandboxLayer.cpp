@@ -40,7 +40,7 @@ SandboxLayer::SandboxLayer() : Layer("Sandbox Layer")
 	gameObject3->SetMeshRenderer(meshRenderer3);
 	Magma::Renderer::AddGameObject(gameObject3);
 
-	const auto& transform4 = Magma::CreateRef<Magma::Transform>(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, -2.5f)), glm::vec3(0.1f)));
+	const auto& transform4 = Magma::CreateRef<Magma::Transform>(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, -2.5f)), glm::vec3(0.05f)));
 	const auto& gameObject4 = Magma::CreateRef<Magma::GameObject>(transform4);
 	const auto& meshRenderer4 = Magma::CreateRef<Magma::MeshRenderer>(bunny);
 	meshRenderer4->SetMaterial(bunnyMaterial);

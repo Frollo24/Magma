@@ -35,6 +35,12 @@ struct DirLight {
 	float intensity;
 };
 
+layout(set = 0, binding = 0) uniform CameraUbo{
+	mat4 viewProj;
+	mat4 proj;
+	mat4 view;
+} camera;
+
 layout(set = 0, binding = 1) uniform Lights{
 	DirLight dirLight;
 } lights;
@@ -58,6 +64,7 @@ void main() {
 	vec3 normal = vec3(normParams, sqrt(1.0 - normParams.x * normParams.x - normParams.y * normParams.y));
 	normal = normalize(normal);
 	vec3 lightDir = normalize(-lights.dirLight.direction);
+	lightDir = (camera.view * vec4(lightDir, 0.0)).xyz;
 
 	// ambient occlusion
 	float AO = texture(t_SSAOTexture, v_TexCoord).r;

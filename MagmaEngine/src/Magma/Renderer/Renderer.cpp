@@ -107,8 +107,12 @@ namespace Magma
 	void Renderer::DrawToScreen()
 	{
 		auto drawToScreenPass = s_RendererData->RenderSwapchain->GetMainRenderPass();
+		u32 width = s_RendererData->RenderSwapchain->GetWidth();
+		u32 height = s_RendererData->RenderSwapchain->GetHeight();
 
 		RenderCommand::BeginRenderPass(drawToScreenPass);
+		RenderCommand::SetViewport(0, 0, width, height);
+		RenderCommand::SetScissor(0, 0, width, height);
 		RenderCommand::BindPipeline(s_RendererData->ScreenPipeline);
 		RenderCommand::BindDescriptorSet(s_RendererData->ScreenDescriptorSet, s_RendererData->ScreenPipeline, 0);
 		RenderCommand::DrawVertices(6, 1, 0, 0);

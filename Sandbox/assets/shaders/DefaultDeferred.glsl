@@ -131,8 +131,10 @@ void main() {
 	float NdotV = max(dot(N, V), 0.0000001);
 	vec3 F = FresnelSchlick(NdotV, F0);
 	vec3 kD = (1.0 - F) * (1.0 - material.metallic);
-	vec3 R = reflect(-V, N);
-	vec3 environment = IBL(material, N, V);
+	vec3 Nworld = (inverse(u_Scene.view) * vec4(N, 0.0)).xyz;
+	vec3 Vworld = (inverse(u_Scene.view) * vec4(V, 0.0)).xyz;
+	vec3 R = reflect(-Vworld, Nworld);
+	vec3 environment = IBL(material, Nworld, Vworld);
 
 	vec3 diffuse = textureLod(t_IrradianceMap, R, 10).rgb * material.albedo.rgb * kD;
 	vec3 specular = environment * F * (1.0 - material.roughness);

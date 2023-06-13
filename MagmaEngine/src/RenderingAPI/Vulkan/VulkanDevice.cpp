@@ -170,6 +170,7 @@ namespace Magma
 		}
 
 		VkPhysicalDeviceFeatures physicalDeviceFeatures{};
+		physicalDeviceFeatures.samplerAnisotropy = VK_TRUE;
 
 		VkDeviceCreateInfo deviceCreateInfo{};
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

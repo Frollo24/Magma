@@ -136,6 +136,7 @@ namespace Magma
 	{
 		switch (format)
 		{
+			case FramebufferTextureFormat::Red:            return VK_IMAGE_ASPECT_COLOR_BIT;
 			case FramebufferTextureFormat::RGBA8:          return VK_IMAGE_ASPECT_COLOR_BIT;
 			case FramebufferTextureFormat::Color:          return VK_IMAGE_ASPECT_COLOR_BIT;
 			case FramebufferTextureFormat::RGBA16F:        return VK_IMAGE_ASPECT_COLOR_BIT;

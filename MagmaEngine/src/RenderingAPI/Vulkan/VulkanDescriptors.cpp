@@ -181,7 +181,7 @@ namespace Magma
 		for (const auto& descriptorSet : m_DescriptorSets)
 		{
 			VkDescriptorImageInfo imageInfo{};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			imageInfo.imageView = vulkanRenderTarget->GetVkImageView();
 			imageInfo.sampler = vulkanRenderTarget->GetVkSampler();
 

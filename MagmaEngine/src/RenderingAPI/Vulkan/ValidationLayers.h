@@ -27,8 +27,8 @@ namespace Magma
 
 		static const std::vector<const char*> c_ValidationLayers;
 
-		static VkDebugUtilsMessengerEXT m_DebugMessenger;
-		static VkDebugUtilsMessengerCreateInfoEXT m_CreateInfo;
+		static VkDebugUtilsMessengerEXT s_DebugMessenger;
+		static VkDebugUtilsMessengerCreateInfoEXT s_CreateInfo;
 
 	};
 }

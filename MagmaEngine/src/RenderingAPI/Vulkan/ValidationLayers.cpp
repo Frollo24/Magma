@@ -8,8 +8,8 @@ namespace Magma
 		"VK_LAYER_KHRONOS_validation"
 	};
 
-	VkDebugUtilsMessengerEXT ValidationLayers::m_DebugMessenger{};
-	VkDebugUtilsMessengerCreateInfoEXT ValidationLayers::m_CreateInfo{};
+	VkDebugUtilsMessengerEXT ValidationLayers::s_DebugMessenger{};
+	VkDebugUtilsMessengerCreateInfoEXT ValidationLayers::s_CreateInfo{};
 
 	VkResult CreateDebugUtilsMessengerEXT(VkInstance& instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -69,14 +69,15 @@ namespace Magma
 	{
 		if (!c_Enabled) return;
 
-		PopulateDebugMessengerCreateInfo(m_CreateInfo);
-		CreateDebugUtilsMessengerEXT(instance, &m_CreateInfo, nullptr, &m_DebugMessenger);
+		PopulateDebugMessengerCreateInfo(s_CreateInfo);
+		VkResult result = CreateDebugUtilsMessengerEXT(instance, &s_CreateInfo, nullptr, &s_DebugMessenger);
+		MGM_CORE_VERIFY(result == VK_SUCCESS);
 	}
 
 	void ValidationLayers::DestroyDebugMessenger(VkInstance instance)
 	{
 		if (c_Enabled)
-			DestroyDebugUtilsMessengerEXT(instance, m_DebugMessenger, nullptr);
+			DestroyDebugUtilsMessengerEXT(instance, s_DebugMessenger, nullptr);
 	}
 
 	void ValidationLayers::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo)

@@ -13,7 +13,10 @@ namespace Magma
 		: m_WindowHandle(window)
 	{
 		MGM_CORE_ASSERT(window, "Window handle is null!");
-		MGM_CORE_VERIFY(ValidationLayers::CheckValidationLayerSupport());
+		if (ValidationLayers::Enabled())
+		{
+			MGM_CORE_VERIFY(ValidationLayers::CheckValidationLayerSupport());
+		}
 
 		VkApplicationInfo appInfo{};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -86,6 +89,10 @@ namespace Magma
 
 		glfwExtensions = glfwGetRequiredInstanceExtensions(&extensionCount);
 		std::vector<const char*> extensions(glfwExtensions, glfwExtensions + extensionCount);
+
+		if (ValidationLayers::Enabled()) {
+			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		}
 
 		return extensions;
 	}

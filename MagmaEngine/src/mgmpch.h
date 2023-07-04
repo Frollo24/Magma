@@ -4,3 +4,4 @@
 #include "Magma/Core/Includes.h"
 #include "Magma/Core/DataTypes.h"
 #include "Magma/Core/Base.h"
+#include "Magma/Core/Log.h"

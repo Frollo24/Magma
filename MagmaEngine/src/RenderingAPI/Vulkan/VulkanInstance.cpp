@@ -61,6 +61,10 @@ namespace Magma
 	{
 		PhysicalDeviceRequirements requirements{};
 		requirements.DeviceType = PhysicalDeviceType::DedicatedGPU;
+		requirements.SupportsGeometryShaders = true;
+		requirements.SupportsTesselationShaders = true;
+		requirements.SupportsAnisotropy = true;
+		// requirements.SupportsRaytracing = true;
 		m_Device = RenderDevice::Create(*this, *surface.get(), requirements);
 		m_Swapchain = RenderSwapchain::Create(m_Device, *surface.get(), m_WindowHandle);
 	}

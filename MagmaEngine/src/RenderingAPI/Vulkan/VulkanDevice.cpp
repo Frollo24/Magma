@@ -56,7 +56,7 @@ namespace Magma
 		}
 	}
 
-	static bool CheckDeviceExtensionSupport(VkPhysicalDevice device)
+	static bool CheckDeviceExtensionSupport(VkPhysicalDevice device, const PhysicalDeviceRequirements& requirements)
 	{
 		u32 extensionCount;
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -65,6 +65,15 @@ namespace Magma
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
 
 		std::unordered_set<std::string> requiredExtensions(c_DeviceExtensions.begin(), c_DeviceExtensions.end());
+
+		if (requirements.SupportsRaytracing)
+		{
+			requiredExtensions.emplace(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+			requiredExtensions.emplace(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+			requiredExtensions.emplace(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+			requiredExtensions.emplace(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
+			requiredExtensions.emplace(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+		}
 
 		for (const auto& extension : availableExtensions) {
 			requiredExtensions.erase(extension.extensionName);
@@ -85,11 +94,20 @@ namespace Magma
 		if (physicalDeviceProperties.deviceType != GetDeviceType(requirements.DeviceType))
 			return false;
 
+		if (requirements.SupportsGeometryShaders && !physicalDeviceFeatures.geometryShader)
+			return false;
+
+		if (requirements.SupportsTesselationShaders && !physicalDeviceFeatures.tessellationShader)
+			return false;
+
+		if (requirements.SupportsAnisotropy && !physicalDeviceFeatures.samplerAnisotropy)
+			return false;
+
 		VulkanDeviceQueueIndices queueIndices = FindQueueIndices(physicalDevice, surface);
 		if (!queueIndices.IsValid())
 			return false;
 
-		if (!CheckDeviceExtensionSupport(physicalDevice))
+		if (!CheckDeviceExtensionSupport(physicalDevice, requirements))
 			return false;
 
 		if (const auto& swapchainSupport = VulkanSwapchain::QuerySwapchainSupportDetails(physicalDevice, surface);

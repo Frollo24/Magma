@@ -16,7 +16,12 @@ namespace Magma
 
 	struct PhysicalDeviceRequirements
 	{
-		PhysicalDeviceType DeviceType;
+		PhysicalDeviceType DeviceType = PhysicalDeviceType::DedicatedGPU;
+		bool SupportsGeometryShaders = false;
+		bool SupportsTesselationShaders = false;
+		bool SupportsMSAA = false;
+		bool SupportsAnisotropy = false;
+		bool SupportsRaytracing = false;
 	};
 
 	class RenderDevice

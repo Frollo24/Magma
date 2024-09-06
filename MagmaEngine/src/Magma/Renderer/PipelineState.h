@@ -37,13 +37,13 @@ namespace Magma
 #pragma endregion
 
 #pragma region PipelineBlendState
-	enum ColorWriteMask
+	enum class ColorWriteMask
 	{
-		ColorWriteMaskR = MGM_BIT(0), // 1
-		ColorWriteMaskG = MGM_BIT(1), // 2
-		ColorWriteMaskB = MGM_BIT(2), // 4
-		ColorWriteMaskA = MGM_BIT(3), // 8
-		ColorWriteMaskAll = ColorWriteMaskR | ColorWriteMaskG | ColorWriteMaskB | ColorWriteMaskA, // 15
+		ColorWriteMaskR = MGM_BIT(0), // 1 (0x0001)
+		ColorWriteMaskG = MGM_BIT(1), // 2 (0x0010)
+		ColorWriteMaskB = MGM_BIT(2), // 4 (0x0100)
+		ColorWriteMaskA = MGM_BIT(3), // 8 (0x1000)
+		ColorWriteMaskAll = ColorWriteMaskR | ColorWriteMaskG | ColorWriteMaskB | ColorWriteMaskA, // 15 (0x1111)
 	};
 
 	enum class BlendFactor
@@ -80,7 +80,7 @@ namespace Magma
 	struct PipelineBlendState
 	{
 		bool BlendEnable = false;
-		ColorWriteMask ColorWriteMask = ColorWriteMaskAll;
+		ColorWriteMask ColorWriteMask = ColorWriteMask::ColorWriteMaskAll;
 		BlendingEquation ColorEquation{};
 		BlendingEquation AlphaEquation{};
 		BlendConstants ConstantColor{};

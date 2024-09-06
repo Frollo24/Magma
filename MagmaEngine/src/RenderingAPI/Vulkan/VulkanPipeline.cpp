@@ -147,7 +147,7 @@ namespace Magma
 		multisampling.alphaToOneEnable = VK_FALSE; // Optional
 
 		VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-		colorBlendAttachment.colorWriteMask = m_Specification.PipelineBlendState.ColorWriteMask;
+		colorBlendAttachment.colorWriteMask = (VkColorComponentFlags)m_Specification.PipelineBlendState.ColorWriteMask;
 		colorBlendAttachment.blendEnable = m_Specification.PipelineBlendState.BlendEnable;
 		colorBlendAttachment.srcColorBlendFactor = (VkBlendFactor)m_Specification.PipelineBlendState.ColorEquation.SrcFactor;
 		colorBlendAttachment.dstColorBlendFactor = (VkBlendFactor)m_Specification.PipelineBlendState.ColorEquation.DstFactor;

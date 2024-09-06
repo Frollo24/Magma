@@ -113,20 +113,21 @@ namespace Magma
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
 		MGM_CORE_INFO("{0} extensions supported", extensionCount);
-		MGM_CORE_INFO("Available extensions:");
 
-		// Not using logger for console readability
+		std::stringstream extensionsStream;
 		for (const auto& extension : extensions) {
 			if (std::string(extension.extensionName).find("VK_NV") != std::string::npos)
-				std::cout << "\u001b[1;32m" << '\t' << extension.extensionName << "\u001b[0m" << '\n';
+				extensionsStream << "\u001b[1;32m" << '\t' << extension.extensionName << "\u001b[0m" << '\n';
 			else if (std::string(extension.extensionName).find("VK_AMD") != std::string::npos)
-				std::cout << "\u001b[31m" << '\t' << extension.extensionName << "\u001b[0m" << '\n';
+				extensionsStream << "\u001b[31m" << '\t' << extension.extensionName << "\u001b[0m" << '\n';
 			else if (std::string(extension.extensionName).find("VK_ARM") != std::string::npos)
-				std::cout << "\u001b[36m" << '\t' << extension.extensionName << "\u001b[0m" << '\n';
+				extensionsStream << "\u001b[36m" << '\t' << extension.extensionName << "\u001b[0m" << '\n';
 			else if (std::string(extension.extensionName).find("VK_EXT") != std::string::npos)
-				std::cout << "\u001b[1;30m" << '\t' << extension.extensionName << "\u001b[0m" << '\n';
+				extensionsStream << "\u001b[1;30m" << '\t' << extension.extensionName << "\u001b[0m" << '\n';
 			else
-				std::cout << '\t' << extension.extensionName << '\n';
+				extensionsStream << '\t' << extension.extensionName << '\n';
 		}
+		std::string extensionsString = extensionsStream.str();
+		MGM_CORE_INFO("Available extensions:\n\u001b[0m{}", extensionsString.substr(0, extensionsString.length() - 1));
 	}
 }

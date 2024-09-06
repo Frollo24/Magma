@@ -27,4 +27,25 @@ namespace Magma
 	constexpr Ref<T> StaticCast(Ref<U> ref) { return std::static_pointer_cast<T>(ref); }
 	template<class T, class U>
 	constexpr Ref<T> DynamicCast(Ref<U> ref) { return std::dynamic_pointer_cast<T>(ref); }
+
+	template <typename T>
+	class RawPointer
+	{
+	public:
+		RawPointer(T* ptr)
+			: m_Ptr(ptr)
+		{
+
+		}
+
+		~RawPointer()
+		{
+			m_Ptr = nullptr;
+		}
+
+		inline T* Get() const { return m_Ptr; }
+
+	private:
+		T* m_Ptr = nullptr;
+	};
 }

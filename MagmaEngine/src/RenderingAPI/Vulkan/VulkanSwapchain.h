@@ -18,8 +18,7 @@ namespace Magma
 	class VulkanSwapchain : public RenderSwapchain
 	{
 	public:
-		VulkanSwapchain(const Ref<RenderDevice>& device, RenderSurface& surface, void* window);
-		VulkanSwapchain(const Ref<RenderDevice>& device, const Scope<RenderSurface>& surface, void* window);
+		VulkanSwapchain(const Ref<RenderDevice>& device, const RawPointer<RenderSurface>& surface, void* window);
 
 		virtual ~VulkanSwapchain();
 

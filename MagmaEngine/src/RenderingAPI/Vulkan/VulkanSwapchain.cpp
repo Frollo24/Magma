@@ -9,15 +9,8 @@
 
 namespace Magma
 {
-	VulkanSwapchain::VulkanSwapchain(const Ref<RenderDevice>& device, RenderSurface& surface, void* window)
-		: m_DeviceHandle(DynamicCast<VulkanDevice>(device)->GetLogicalDevice()), m_Surface(dynamic_cast<VulkanSurface*>(&surface)->GetHandle())
-	{
-		m_RenderDevice = DynamicCast<VulkanDevice>(device);
-		Create(m_RenderDevice, window);
-	}
-
-	VulkanSwapchain::VulkanSwapchain(const Ref<RenderDevice>& device, const Scope<RenderSurface>& surface, void* window)
-		: m_DeviceHandle(DynamicCast<VulkanDevice>(device)->GetLogicalDevice()), m_Surface(dynamic_cast<VulkanSurface*>(surface.get())->GetHandle())
+	VulkanSwapchain::VulkanSwapchain(const Ref<RenderDevice>& device, const RawPointer<RenderSurface>& surface, void* window)
+		: m_DeviceHandle(DynamicCast<VulkanDevice>(device)->GetLogicalDevice()), m_Surface(dynamic_cast<VulkanSurface*>(surface.Get())->GetHandle())
 	{
 		m_RenderDevice = DynamicCast<VulkanDevice>(device);
 		Create(m_RenderDevice, window);

@@ -6,18 +6,7 @@
 
 namespace Magma
 {
-	Ref<RenderSwapchain> RenderSwapchain::Create(const Ref<RenderDevice>& device, RenderSurface& surface, void* window)
-	{
-		switch (RenderContext::GetAPI())
-		{
-			case RenderAPI::None:      MGM_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RenderAPI::Vulkan:	   return CreateRef<VulkanSwapchain>(device, surface, window);
-		}
-
-		MGM_CORE_ASSERT(false, "Unknown render API!"); return nullptr;
-	}
-
-	Ref<RenderSwapchain> RenderSwapchain::Create(const Ref<RenderDevice>& device, const Scope<RenderSurface>& surface, void* window)
+	Ref<RenderSwapchain> RenderSwapchain::Create(const Ref<RenderDevice>& device, const RawPointer<RenderSurface>& surface, void* window)
 	{
 		switch (RenderContext::GetAPI())
 		{

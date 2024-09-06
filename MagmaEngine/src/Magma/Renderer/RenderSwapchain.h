@@ -22,6 +22,7 @@ namespace Magma
 		inline virtual u32 GetHeight() const = 0;
 
 		static Ref<RenderSwapchain> Create(const Ref<RenderDevice>& device, RenderSurface& surface, void* window);
+		static Ref<RenderSwapchain> Create(const Ref<RenderDevice>& device, const RawPointer<RenderSurface>& surface, void* window);
 		static Ref<RenderSwapchain> Create(const Ref<RenderDevice>& device, const Scope<RenderSurface>& surface, void* window);
 	};
 }

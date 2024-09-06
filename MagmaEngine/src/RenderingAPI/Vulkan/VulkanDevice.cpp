@@ -118,23 +118,11 @@ namespace Magma
 		return true;
 	}
 
-	VulkanDevice::VulkanDevice(GraphicsInstance& instance, RenderSurface& surface, const PhysicalDeviceRequirements& requirements)
+	VulkanDevice::VulkanDevice(const RawPointer<GraphicsInstance>& instance, const RawPointer<RenderSurface>& surface, const PhysicalDeviceRequirements& requirements)
 	{
-		VkInstance instanceHandle = dynamic_cast<VulkanInstance*>(&instance)->GetInstanceHandle();
+		VkInstance instanceHandle = dynamic_cast<VulkanInstance*>(instance.Get())->GetInstanceHandle();
 		MGM_CORE_ASSERT(instanceHandle, "Invalid Graphics Instance!");
-		VkSurfaceKHR surfaceHandle = dynamic_cast<VulkanSurface*>(&surface)->GetHandle();
-		MGM_CORE_ASSERT(surfaceHandle, "Invalid Render Surfce!");
-		PickPhysicalDevice(instanceHandle, surfaceHandle, requirements);
-		CreateLogicalDevice();
-
-		MGM_CORE_INFO("Successfully created Render Device!");
-	}
-
-	VulkanDevice::VulkanDevice(const Scope<GraphicsInstance>& instance, const Scope<RenderSurface>& surface, const PhysicalDeviceRequirements& requirements)
-	{
-		VkInstance instanceHandle = dynamic_cast<VulkanInstance*>(instance.get())->GetInstanceHandle();
-		MGM_CORE_ASSERT(instanceHandle, "Invalid Graphics Instance!");
-		VkSurfaceKHR surfaceHandle = dynamic_cast<VulkanSurface*>(surface.get())->GetHandle();
+		VkSurfaceKHR surfaceHandle = dynamic_cast<VulkanSurface*>(surface.Get())->GetHandle();
 		MGM_CORE_ASSERT(surfaceHandle, "Invalid Render Surfce!");
 		PickPhysicalDevice(instanceHandle, surfaceHandle, requirements);
 		CreateLogicalDevice();

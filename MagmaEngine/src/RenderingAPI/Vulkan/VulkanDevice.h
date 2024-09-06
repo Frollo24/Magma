@@ -25,8 +25,7 @@ namespace Magma
 	class VulkanDevice : public RenderDevice
 	{
 	public:
-		VulkanDevice(GraphicsInstance& instance, RenderSurface& surface, const PhysicalDeviceRequirements& requirements);
-		VulkanDevice(const Scope<GraphicsInstance>& instance, const Scope<RenderSurface>& surface, const PhysicalDeviceRequirements& requirements);
+		VulkanDevice(const RawPointer<GraphicsInstance>& instance, const RawPointer<RenderSurface>& surface, const PhysicalDeviceRequirements& requirements);
 		virtual ~VulkanDevice();
 
 		inline VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }

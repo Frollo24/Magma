@@ -65,8 +65,11 @@ namespace Magma
 		requirements.SupportsTesselationShaders = true;
 		requirements.SupportsAnisotropy = true;
 		// requirements.SupportsRaytracing = true;
-		m_Device = RenderDevice::Create(*this, *surface.get(), requirements);
-		m_Swapchain = RenderSwapchain::Create(m_Device, *surface.get(), m_WindowHandle);
+
+		RawPointer<GraphicsInstance> instance = this;
+		RawPointer<RenderSurface> renderSurface = surface.get();
+		m_Device = RenderDevice::Create(instance, renderSurface, requirements);
+		m_Swapchain = RenderSwapchain::Create(m_Device, renderSurface, m_WindowHandle);
 	}
 
 	void VulkanInstance::Shutdown()

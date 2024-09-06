@@ -29,8 +29,7 @@ namespace Magma
 	public:
 		virtual ~RenderDevice() = default;
 
-		static Ref<RenderDevice> Create(GraphicsInstance& instance, RenderSurface& surface, const PhysicalDeviceRequirements& requirements);
-		static Ref<RenderDevice> Create(const Scope<GraphicsInstance>& instance, const Scope<RenderSurface>& surface, const PhysicalDeviceRequirements& requirements);
+		static Ref<RenderDevice> Create(const RawPointer<GraphicsInstance>& instance, const RawPointer<RenderSurface>& surface, const PhysicalDeviceRequirements& requirements);
 	};
 }
 

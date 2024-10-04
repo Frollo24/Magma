@@ -22,6 +22,23 @@ namespace Magma
 		VkQueue PresentQueue = VK_NULL_HANDLE;
 	};
 
+	struct VulkanPhysicalDeviceSelectionOptions
+	{
+		u32 DeviceScore = 0;
+		enum class Suitability { No, Partial, Yes };
+		Suitability Suitable = Suitability::No;
+
+		VkPhysicalDevice PhysicalDevice = VK_NULL_HANDLE;
+		VkPhysicalDeviceProperties Properties = { 0 };
+		VkPhysicalDeviceMemoryProperties MemoryProperties = { 0 };
+		VkPhysicalDeviceFeatures Features = { 0 };
+		PhysicalDeviceType Type = PhysicalDeviceType::Other;
+
+		VkSurfaceKHR Surface = VK_NULL_HANDLE;
+
+		VulkanDeviceQueueIndices QueueIndices = {};
+	};
+
 	class VulkanDevice : public RenderDevice
 	{
 	public:
@@ -31,16 +48,24 @@ namespace Magma
 		inline VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
 		inline VkDevice GetLogicalDevice() const { return m_LogicalDevice; }
 
+		inline const VkPhysicalDeviceProperties& GetProperties() const { return m_DeviceProperties; }
+		inline const VkPhysicalDeviceFeatures& GetFeatures() const { return m_DeviceFeatures; }
+		inline const VkPhysicalDeviceMemoryProperties& GetMemoryProperties() const { return m_DeviceMemoryProperties; }
+
 		inline const VulkanDeviceQueueIndices& GetQueueIndices() const { return m_QueueIndices; }
 		inline const VulkanDeviceQueueHandles& GetQueueHandles() const { return m_QueueHandles; }
 
 	private:
 		void PickPhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface, const PhysicalDeviceRequirements& requirements);
-		void CreateLogicalDevice();
+		void CreateLogicalDevice(bool raytracingSupport);
 
 	private:
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 		VkDevice m_LogicalDevice = VK_NULL_HANDLE;
+
+		VkPhysicalDeviceProperties m_DeviceProperties = { 0 };
+		VkPhysicalDeviceFeatures m_DeviceFeatures = { 0 };
+		VkPhysicalDeviceMemoryProperties m_DeviceMemoryProperties = { 0 };
 
 		VulkanDeviceQueueIndices m_QueueIndices;
 		VulkanDeviceQueueHandles m_QueueHandles;

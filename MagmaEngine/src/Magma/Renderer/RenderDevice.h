@@ -11,7 +11,9 @@ namespace Magma
 		IntegratedGPU,
 		DedicatedGPU,
 		VirtualGPU,
-		CPU
+		CPU,
+		DontCare,
+		Unknown
 	};
 
 	struct PhysicalDeviceRequirements

@@ -129,8 +129,8 @@ namespace Magma
 
 	void Renderer::Shutdown()
 	{
-		delete s_RendererData;
 		RenderCommand::Shutdown();
+		delete s_RendererData;
 
 		SubsystemManager::Shutdown();
 

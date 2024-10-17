@@ -40,6 +40,7 @@ namespace Magma
 	void GlfwWindow::OnUpdate()
 	{
 		glfwPollEvents();
+		m_Instance->PresentFrame();
 		if (m_Data.WasResized)
 		{
 			while (m_Data.Minimized)
@@ -49,10 +50,6 @@ namespace Magma
 
 			m_Data.WasResized = false;
 			m_Instance->GetSwapchain()->Invalidate(m_Window);
-		}
-		else
-		{
-			m_Instance->PresentFrame();
 		}
 	}
 

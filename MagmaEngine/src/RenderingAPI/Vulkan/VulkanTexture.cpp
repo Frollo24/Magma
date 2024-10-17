@@ -356,11 +356,6 @@ namespace Magma
 		vkFreeMemory(m_Device, m_ImageMemory, nullptr);
 	}
 
-	Ref<VulkanFramebufferTexture2D> VulkanFramebufferTexture2D::CreateFromImageView(const VkImageView& imageView)
-	{
-		return CreateRef<VulkanFramebufferTexture2D>(imageView);
-	}
-
 	VulkanTextureCube::VulkanTextureCube(const Ref<RenderDevice>& device, const std::array<std::string, 6>& filepaths, const bool generateMipmapsOnLoad)
 		: m_VulkanDevice(DynamicCast<VulkanDevice>(device))
 	{

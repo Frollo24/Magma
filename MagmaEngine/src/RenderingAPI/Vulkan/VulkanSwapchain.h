@@ -27,7 +27,7 @@ namespace Magma
 		virtual void PresentFrame() override;
 
 		inline VkSwapchainKHR GetHandle() const { return m_Swapchain; }
-		inline const Ref<VulkanFramebuffer>& GetFramebuffer(u32 index) const { return m_Framebuffers[index]; }
+		inline const VkFramebuffer& GetFramebuffer(u32 index) const { return m_Framebuffers[index]; }
 		inline const VkExtent2D& GetExtent() const { return m_Extent; }
 		inline Ref<RenderPass> GetMainRenderPass() const override { return m_RenderPass; }
 		inline u32 GetImageCount() const override { return m_ImageCount; }
@@ -63,10 +63,11 @@ namespace Magma
 		u32 m_ImageCount = 0;
 		std::vector<VkImage> m_Images{};
 		std::vector<VkImageView> m_ImageViews{};
+		std::vector<VkFramebuffer> m_Framebuffers{};
 
 		Ref<VulkanDevice> m_RenderDevice = nullptr;
 		Ref<VulkanRenderPass> m_RenderPass = nullptr;
-		std::vector<Ref<VulkanFramebuffer>> m_Framebuffers{};
+		// std::vector<Ref<VulkanFramebuffer>> m_Framebuffers{};
 	};
 }
 

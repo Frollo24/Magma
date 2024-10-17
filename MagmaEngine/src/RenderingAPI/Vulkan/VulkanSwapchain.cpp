@@ -30,12 +30,17 @@ namespace Magma
 		m_Framebuffers.resize(m_ImageCount);
 
 		for (size_t i = 0; i < m_ImageCount; i++) {
-			FramebufferSpecification spec;
-			spec.RenderTargets.push_back(VulkanFramebufferTexture2D::CreateFromImageView(m_ImageViews[i]));
-			spec.TextureSpecs = { { FramebufferTextureFormat::RGBA8 } };
-			spec.Width = m_Extent.width;
-			spec.Height = m_Extent.height;
-			m_Framebuffers[i] = CreateRef<VulkanFramebuffer>(spec, device, renderPass);
+			VkFramebufferCreateInfo framebufferInfo{};
+			framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			framebufferInfo.renderPass = m_RenderPass->GetHandle();
+			framebufferInfo.attachmentCount = 1;
+			framebufferInfo.pAttachments = &m_ImageViews[i];
+			framebufferInfo.width = m_Extent.width;
+			framebufferInfo.height = m_Extent.height;
+			framebufferInfo.layers = 1;
+
+			VkResult result = vkCreateFramebuffer(m_DeviceHandle, &framebufferInfo, nullptr, &m_Framebuffers[i]);
+			MGM_CORE_VERIFY(result == VK_SUCCESS);
 		}
 	}
 
@@ -171,8 +176,8 @@ namespace Magma
 
 	void VulkanSwapchain::Destroy()
 	{
-		for (auto& framebuffer : m_Framebuffers)
-			framebuffer = nullptr;
+		for (const auto& framebuffer : m_Framebuffers)
+			vkDestroyFramebuffer(m_DeviceHandle, framebuffer, nullptr);
 
 		for (const auto& imageView : m_ImageViews)
 			vkDestroyImageView(m_DeviceHandle, imageView, nullptr);

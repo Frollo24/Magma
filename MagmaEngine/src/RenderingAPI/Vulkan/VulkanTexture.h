@@ -63,8 +63,6 @@ namespace Magma
 		inline const VkImageView& GetVkImageView() { return m_ImageView; }
 		inline const VkSampler& GetVkSampler() { return m_Sampler; }
 
-		static Ref<VulkanFramebufferTexture2D> CreateFromImageView(const VkImageView& imageView);
-
 		VulkanFramebufferTexture2D(const VkImageView& imageView) : m_ImageView(imageView) {}
 
 	private:

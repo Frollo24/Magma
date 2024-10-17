@@ -226,7 +226,7 @@ namespace Magma
 		const bool& isSwapchainTarget = renderPass->GetSpecification().IsSwapchainTarget;
 		const Ref<VulkanFramebuffer>& framebuffer = DynamicCast<VulkanFramebuffer>(pass->GetFramebuffer());
 		renderPassInfo.framebuffer = isSwapchainTarget ?
-			swapchain->GetFramebuffer(imageIndex)->GetHandle() :
+			swapchain->GetFramebuffer(imageIndex) :
 			framebuffer->GetHandle();
 
 		renderPassInfo.renderArea.offset = { 0, 0 };
